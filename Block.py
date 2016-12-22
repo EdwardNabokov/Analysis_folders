@@ -40,6 +40,7 @@ class Block:
         return self.block
 
     def __eq__(self, other_check_sum):
+        print('comparing')
         return self.simple_checksum == other_check_sum
 
     def __str__(self):

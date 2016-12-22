@@ -7,38 +7,19 @@ import asyncio
 import pprint
 import pickle
 import math
+import sys
 
+folder_another = Folder('C:\\Users\\Edward\\Desktop\\test')
+folder_my = Folder('C:\\Users\\Edward\\Desktop\\test4')
 
-folder1 = Folder('C:\\Users\\Edward\\Desktop\\MKR')
-folder2 = Folder('C:\\Users\\Edward\\Desktop\\MKR-2')
-folder3 = Folder('C:\\Users\\Edward\\Desktop\\MKR1')
-folder4 = Folder('C:\\Users\\Edward\\Desktop\\MKR4')
+log_from_another_computer = folder_another.get_log_file()
+log_my = folder_my.get_log_file()
 
-unmatched_folders = Logs(folder1.get_log_file(), folder2.get_log_file()).compare_folders()
-unmatched_files = Logs(folder1.get_log_file(), folder2.get_log_file()).compare()
+result = Logs(log_my, log_from_another_computer).compare()
+result2 = Logs(log_from_another_computer, log_my).compare()
 
-folder1.create_folder(unmatched_folders)
-folder1.create_files(unmatched_files)
-
-unmatched_folders = Logs(folder3.get_log_file(), folder2.get_log_file()).compare_folders()
-unmatched_files = Logs(folder3.get_log_file(), folder2.get_log_file()).compare()
-
-folder3.create_folder(unmatched_folders)
-folder3.create_files(unmatched_files)
-
-unmatched_folders = Logs(folder4.get_log_file(), folder2.get_log_file()).compare_folders()
-unmatched_files = Logs(folder4.get_log_file(), folder2.get_log_file()).compare()
-
-folder4.create_folder(unmatched_folders)
-folder4.create_files(unmatched_files)
-
-
-
-
-
-
-
-
+folder_my.create(result)
+folder_another.create(result2)
 
 
 

@@ -14,6 +14,7 @@ from Message import Message
 folder_another = Folder('C:\\Users\\Edward\\Desktop\\test')
 folder_my = Folder('C:\\Users\\Edward\\Desktop\\test4')
 
+
 msg = Message()
 
 b = HandlerMessage(msg.get_log()).get_from()

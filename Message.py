@@ -1,5 +1,5 @@
 
-commands = ['__GET_LOG__', '__SEND_LOG__', '__GET_FILE__', '__SEND_FILE__']
+commands = ['__GET_LOG__', '__SEND_LOG__', '__GET_FILE__', '__SEND_FILE__', '__GET_BLOCK__', '__SEND_BLOCK__']
 
 
 class Message:
@@ -28,3 +28,13 @@ class Message:
         print('Sure... Here it is')
         command = commands[3]
         return command, self.my_ip, self.other_ip, file
+
+    def get_block(self, block_obj):
+        print('Pss... i need block - > ', block_obj )
+        command = commands[4]
+        return command, self.my_ip, self.other_ip, block_obj
+
+    def send_block(self, block):
+        print('Here it is, your block')
+        command = commands[5]
+        return command, self.my_ip, self.other_ip, block

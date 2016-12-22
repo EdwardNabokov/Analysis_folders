@@ -7,6 +7,12 @@ import math
 class File:
 
     def __init__(self, rel_path, file_path, block_size=1024):
+        """
+        initialize essential parameters
+        :param rel_path: it's path EXACTLY from the current folder (Example: ..//test)
+        :param file_path: it's path from its root (Example: C://Downloads//test)
+        :param block_size: 1024 by default
+        """
         self.block_size = block_size
         self.file_path = file_path
         self.rel_path = rel_path
@@ -19,8 +25,8 @@ class File:
     def __eq__(self, other):
         if len(self.list_blocks_checksums) < len(other.list_blocks_checksums):
             for i, checksum in enumerate(self.list_blocks_checksums):
-                if checksum != other.list_blocks_checksums[i]:
-                    pass
+                if self._iterator_block_list() == other.list_blocks_checksums[i]:
+                    print('qwe equal')
                     #print('Block with position {} are different'.format(i))
         else:
             for i, checksum in enumerate(other.list_blocks_checksums):

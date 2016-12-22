@@ -6,7 +6,11 @@ from File import File
 class Folder:
 
     def __init__(self, path, size_of_block=1024):
-        # List which will store all of the full file_paths.
+        """
+        initialize essential parameters
+        :param path: path to current folder
+        :param size_of_block: 1024 by default
+        """
         self.base_path = path
         self.log_file = {}
         self.folder_name = os.path.basename(self.base_path)
@@ -31,16 +35,24 @@ class Folder:
         return self.base_path
 
     def create_folders(self, path_to_folder):
+        """
+        create folder in the current path to folder
+        :param path_to_folder: it's path to the current folder
+        """
         try:
-
             if not os.path.exists(self.base_path + path_to_folder):
-                os.makedirs(self.base_path + path_to_folder) # here
+                os.makedirs(self.base_path + path_to_folder)
                 print("Created!")
         except:
             print("Something went wrong!")
             sys.exit(0)
 
     def create_files(self, file_object, file):
+        """
+        create files in the current directory
+        :param file_object: certain file that we have to create
+        :param file: file (in bytes)
+        """
         try:
             f = open(self.base_path + '\\' + file_object.get_file_path(), 'wb+')
             f.write(file)

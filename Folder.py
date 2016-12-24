@@ -37,7 +37,7 @@ class Folder:
     def get_path(self):
         return self.base_path
 
-    def create_folder(self, path_to_folder):
+    def create_folders(self, path_to_folder):
         """
         create folder in the current path to folder
         :param path_to_folder: it's path to the current folder
@@ -57,7 +57,6 @@ class Folder:
         :param file: file (in bytes)
         """
         try:
-            print('file_object.get_file_path() ->', file_object.get_file_path())
             f = open(self.base_path + '\\' + file_object.get_file_path(), 'wb+')
             f.write(file)
             f.close()
@@ -68,7 +67,7 @@ class Folder:
             sys.exit(0)
 
     def create(self, folders_an_files):
-        self.create_folder(folders_an_files[0])
+        self.create_folders(folders_an_files[0])
         # self.create_files(folders_an_files[1], )
 
 

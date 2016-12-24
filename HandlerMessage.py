@@ -19,7 +19,9 @@ class HandlerMessage:
 
         if self.info[0] == '__SEND_LOG__':
             print('I got your request for log')
-            answer = ('__GOT_LOG__', self.info[1])
+            a = Message()
+            answer = a.got_log(self.info)
+            print(answer)
             return answer
 
         if self.info[0] == '__GET_FILE__':
@@ -30,6 +32,9 @@ class HandlerMessage:
             return answer
 
         if self.info[0] == '__SEND_FILE__':
-            print('I got your request for log')
-            answer = ('__GOT_FILE__', self.info[1])
+            print('I got your request for file')
+            a = Message()
+            current = ('__GOT_FILE__', self.info[1])
+            answer = a.send_log(current)
+            print(answer)
             return answer

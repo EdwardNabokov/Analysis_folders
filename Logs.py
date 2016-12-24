@@ -17,8 +17,8 @@ class Logs:
             # print('There is no files to download')
         print(result2)
         for key_path in list(result2):
-            if self.log_first[key_path] != self.log_second[key_path]:
-                pass
+            if self.log_first[key_path] == self.log_second[key_path]:
+                print('Equal?')
         # absent_files = [key for key in self.log_second.keys()]
         return list(absent_files)
 
@@ -34,4 +34,5 @@ class Logs:
     def compare(self):
         if len(self.compare_files()) == 0 and len(self.compare_folders()) == 0:
             print('Folders are equal')
+            return 'hah', 'llf'
         return self.compare_folders(), self.compare_files()

@@ -18,7 +18,8 @@ msg = Message()
 
 b = HandlerMessage(msg.get_log()).response()
 
-log_from_another_computer = b[3]
+print(b)
+log_from_another_computer = b[1]
 log_my = folder_my.get_log_file()
 result = Logs(log_my, log_from_another_computer).compare()
 # result2 = Logs(log_from_another_computer, log_my).compare()
@@ -29,7 +30,7 @@ for file_path in result[1]:
     file_obj = log_from_another_computer[file_path]
     file = HandlerMessage(request).response()
     folder_my.create_folders(file_obj.get_rel_path())
-    folder_my.create_files(file_obj, file[3])
+    folder_my.create_files(file_obj, file[1])
 
 
 

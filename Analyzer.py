@@ -5,7 +5,7 @@ from Logs import *
 from queue import *
 import time
 
-folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
+# folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
 
 
 class Analyzer:
@@ -40,28 +40,38 @@ class Analyzer:
                     print('here you are -> ', answer)
                 else:
                     self.push_message(answer)
+                print(self.out_queue.qsize())
 
     def push_message(self, answer):
         if answer[0] == '__GOT_LOG__':
+            print('Answer: ', answer)
             self.another_log = answer[1]
+            print('Another lof', self.another_log)
+            print('My log: ', self.my_log)
             if len(self.another_log_copy) == 0:
                 self.another_log_copy = self.another_log
                 print('It''s new Log folder!')
-            diff_files = Logs(self.another_log_copy, self.another_log).compare()
-            print(diff_files)
+            diff_files = Logs(self.my_log, self.another_log).compare_files()
+            print('Folders: ', diff_files)
+            a = Message()
+            for i in diff_files:
+                request = a.get_file(i)
+                self.out_queue.put(request)
 
         if answer[0] == '__GOT_FILE__':
             print('Got file! utc utc utc')
 
-msg = Message()
-
-b = Queue()
-b.put(msg.send_log(folder_another.get_log_file()))
-c = Queue()
-
-a = Analyzer('C:\\Users\\Edward\\Desktop\\test', b, c)
-a.run()
-
-print(b.qsize())
-print(c.get())
+# msg = Message()
+#
+# b = Queue()
+# b.put(msg.send_log(folder_another.get_log_file()))
+# print(msg.send_log(folder_another.get_log_file()))
+# print(msg.send_log(Folder('C:\\Users\\Edward\\Desktop\\test').get_log_file()))
+# c = Queue()
+#
+# a = Analyzer('C:\\Users\\Edward\\Desktop\\test', b, c)
+# a.run()
+#
+# print(b.qsize())
+# print(c.get())
 

@@ -17,7 +17,7 @@ class ListenServer:
 	def __init__(self, path):
 		self.sock = socket(AF_INET, SOCK_STREAM)
 		self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-		self.sock.bind(('127.0.0.1', 0))
+		self.sock.bind(('', 0))
 		self.sock.listen(5)
 
 		self.path = path
@@ -39,7 +39,6 @@ class ListenServer:
 			connection = ConnectionHandler()
 			await curio.spawn(connection.runHandler(name, self.addr, self.path, self.client))
 
-
 if __name__ == '__main__':
-	server = ListenServer('/Users/Alexander/Project/')
+	server = ListenServer('C:\\Users\\Edward\\Desktop\\test4')
 	curio.run(server.start())

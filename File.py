@@ -40,8 +40,8 @@ class File:
         return self.file_name
 
     def get_file_path(self):
-        curr_path = self.rel_path + '\\' + self.file_name
-        if platform != 'Win32':
+        curr_path = self.file_path
+        if platform != 'win32':
             curr_path = curr_path.replace('\\', '/')
         else:
             curr_path = curr_path.replace('/', '\\')
@@ -55,8 +55,8 @@ class File:
 
     def get_rel_path_name(self):
         curr_path = self.rel_path + '\\' + self.file_name
-        if platform != 'Win32':
-            curr_path.replace('\\', '/')
+        if platform != 'win32':
+            curr_path = curr_path.replace('\\', '/')
         else:
             curr_path = curr_path.replace('/', '\\')
         return curr_path

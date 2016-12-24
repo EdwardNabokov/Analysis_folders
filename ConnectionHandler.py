@@ -61,7 +61,7 @@ class ConnectionHandler:
 		while True:
 			item = await curio.abide(self.send.get)
 			if item:
-				await curio.sleep(0.003)
+				await curio.sleep(0.03)
 				await self.connection.send_message(item)
 
 if __name__ == '__main__':

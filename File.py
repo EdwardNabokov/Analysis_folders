@@ -46,6 +46,9 @@ class File:
     def get_file_name(self):
         return self.file_name
 
+    def get_rel_path_name(self):
+        return self.rel_path + '\\' + self.file_name
+
     def get_rel_path(self):
         return self.rel_path
 

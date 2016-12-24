@@ -20,7 +20,7 @@ class Logs:
             if self.log_first[key_path] == self.log_second[key_path]:
                 print('Equal?')
         # absent_files = [key for key in self.log_second.keys()]
-        return list(absent_files)
+        return sorted(absent_files)
 
     def compare_folders(self):
         first_set = [value.get_rel_path() for value in self.log_first.values()]
@@ -29,7 +29,8 @@ class Logs:
         # absent_folder = [value[1] for value in self.log_second.values()]
         if len(absent_folders_paths) == 0 and len(self.log_second.values()) == 0:
             absent_folders_paths = [value.get_rel_path() for value in self.log_first.values()]
-        return absent_folders_paths
+        absent_folders_paths = list(absent_folders_paths)
+        return sorted(absent_folders_paths)
 
     def compare(self):
         if len(self.compare_files()) == 0 and len(self.compare_folders()) == 0:

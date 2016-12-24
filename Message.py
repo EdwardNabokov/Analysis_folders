@@ -11,34 +11,34 @@ class Message:
         self.path_folder = ''
 
     def get_log(self):
-        print('Send me your log please')
+        # print('Send me your log please')
         command = commands[0]
         return command
 
     def send_log(self, my_log):
-        print('No prob, man')
+        # print('No prob, man')
         command = commands[1]
         return command, my_log
 
     def got_log(self, another_log):
-        print('Ha, I got log from another computer')
+        # print('Ha, I got log from another computer')
         command = commands[2]
         return command, another_log[1]
 
     def get_file(self, rel_path_file):
-        print('Hey... Could you send me file?  -> ', rel_path_file)
+        # print('Hey... Could you send me file?  -> ', rel_path_file)
         command = commands[3]
         return command, rel_path_file
 
-    def send_file(self, file):
-        print('Sure... Here it is')
+    def send_file(self, rel_path_file, file):
+        # print('Sure... Here it is')
         command = commands[4]
-        return command, file
+        return command, rel_path_file, file
 
-    def got_file(self, another_file):
-        print('I got file from another computer -> ', another_file)
+    def got_file(self, rel_path_file, another_file):
+        print('I got file from another computer -> ')
         command = commands[5]
-        return command, another_file[1]
+        return command, rel_path_file, another_file
 
     def get_block(self, block_obj):
         print('Pss... i need block - > ', block_obj)

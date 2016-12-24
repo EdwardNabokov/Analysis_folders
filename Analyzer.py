@@ -29,12 +29,12 @@ class Analyzer:
         self.out_queue.put(msg.get_log())
 
         while True:
-            if self.in_queue.empty():
+            if self.in_queue.empty(): 
                 time.sleep(3)
             else:
                 # print(self.in_queue.qsize())
                 # print('Answer', self.in_queue.get())
-                answer = HandlerMessage(self.in_queue.get()).response()
+                answer = HandlerMessage(self.in_queue.get(), self.folder).response()
                 # print('Answer ->)', answer[0])
                 if (answer[0] is not '__GOT_LOG__') and (answer[0] is not '__GOT_FILE__'):
                     self.out_queue.put(answer)
@@ -68,15 +68,3 @@ class Analyzer:
             #     self.folder.create_files(file_obj, answer[2])
             # self.folder.create_files()
             pass
-
-msg = Message()
-
-b = Queue()
-b.put(msg.send_log(folder_another.get_log_file()))
-
-
-c = Queue()
-
-a = Analyzer('C:\\Users\\Edward\\Desktop\\test', b, c)
-a.run()
-

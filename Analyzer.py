@@ -46,7 +46,7 @@ class Analyzer:
             self.another_log = answer[1]
             if len(self.another_log_copy) == 0:
                 self.another_log_copy = self.another_log
-                print('It''s new Log file!')
+                print('It''s new Log folder!')
             diff_files = Logs(self.another_log_copy, self.another_log).compare()
             print(diff_files)
 

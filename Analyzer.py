@@ -70,7 +70,7 @@ if __name__ == '__main__':
     folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
     msg = Message()
 
-    
+
     b = Queue()
     b.put(msg.send_log(folder_another.get_log_file()))
 

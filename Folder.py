@@ -1,6 +1,7 @@
 import os
 import sys
 from File import File
+from sys import platform
 
 
 class Folder:
@@ -23,6 +24,8 @@ class Folder:
                 else:
                     rel_path = root[len(self.base_path):]
                     key = rel_path + '\\' + file
+                if platform != 'Win32':
+                    key.replace('\\', '/')
                 self.log_file[key] = File(rel_path, self.base_path + key)
 
     def get_log_file(self):
@@ -69,3 +72,4 @@ class Folder:
         # self.create_files(folders_an_files[1], )
 
 
+folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')

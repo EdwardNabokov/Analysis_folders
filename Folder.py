@@ -25,8 +25,12 @@ class Folder:
                     rel_path = root[len(self.base_path):]
                     key = rel_path + '\\' + file
                 if platform != 'Win32':
-                    key.replace('\\', '/')
-                    rel_path.replace('\\', '/')
+                    key = key.replace('\\', '/')
+                    rel_path = rel_path.replace('\\', '/')
+                else:
+                    key = key.replace('/', '\\')
+                    rel_path = rel_path.replace('/', '\\')
+
                 self.log_file[key] = File(rel_path, self.base_path + key)
 
     def get_log_file(self):
@@ -58,10 +62,15 @@ class Folder:
         :param file: file (in bytes)
         """
         try:
+
             print('file_object.get_file_path() ->', file_object.get_file_path())
             curr_path = self.base_path + '\\' + file_object.get_file_path()
+
             if platform != 'Win32':
-                curr_path.replace('\\', '/')
+                curr_path = curr_path.replace('\\', '/')
+            else:
+                curr_path = curr_path.replace('/', '\\')
+
             f = open(curr_path, 'wb+')
             f.write(file)
             f.close()
@@ -74,3 +83,5 @@ class Folder:
     def create(self, folders_an_files):
         self.create_folder(folders_an_files[0])
         # self.create_files(folders_an_files[1], )
+
+folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')

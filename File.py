@@ -42,7 +42,9 @@ class File:
     def get_file_path(self):
         curr_path = self.rel_path + '\\' + self.file_name
         if platform != 'Win32':
-            curr_path.replace('\\', '/')
+            curr_path = curr_path.replace('\\', '/')
+        else:
+            curr_path = curr_path.replace('/', '\\')
         return curr_path
 
     def get_list_checksums(self):
@@ -55,6 +57,8 @@ class File:
         curr_path = self.rel_path + '\\' + self.file_name
         if platform != 'Win32':
             curr_path.replace('\\', '/')
+        else:
+            curr_path = curr_path.replace('/', '\\')
         return curr_path
 
     def get_rel_path(self):

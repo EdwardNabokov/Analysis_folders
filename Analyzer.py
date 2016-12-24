@@ -29,15 +29,11 @@ class Analyzer:
             if self.in_queue.empty():
                 time.sleep(3)
             else:
-                #print(self.in_queue.qsize())
-                # print('Answer', self.in_queue.get())
                 answer = HandlerMessage(self.in_queue.get(), self.folder).response()
-                #print('Answer ->)', answer[0])
                 if (answer[0] is not '__GOT_LOG__') and (answer[0] is not '__GOT_FILE__'):
                     self.out_queue.put(answer)
                 else:
                     self.push_message(answer)
-                # print(self.out_queue.qsize())
 
     def push_message(self, answer):
         if answer[0] == '__GOT_LOG__':
@@ -69,13 +65,9 @@ class Analyzer:
 if __name__ == '__main__':
     folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
     msg = Message()
-
-
     b = Queue()
     b.put(msg.send_log(folder_another.get_log_file()))
-
     c = Queue()
-
     a = Analyzer('C:\\Users\\Edward\\Desktop\\test', b, c)
     a.run()
 

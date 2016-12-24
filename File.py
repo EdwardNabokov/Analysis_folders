@@ -2,6 +2,7 @@ from Block import Block
 from DateTime import DateTime
 import os
 import math
+from sys import platform
 
 
 class File:
@@ -26,7 +27,8 @@ class File:
         if len(self.list_blocks_checksums) < len(other.list_blocks_checksums):
             for i, checksum in enumerate(self.list_blocks_checksums):
                 if self._iterator_block_list() == other.list_blocks_checksums[i]:
-                    print('qwe equal')
+                    # print('qwe equal')
+                    pass
                     #print('Block with position {} are different'.format(i))
         else:
             for i, checksum in enumerate(other.list_blocks_checksums):
@@ -38,7 +40,10 @@ class File:
         return self.file_name
 
     def get_file_path(self):
-        return self.rel_path + '\\' + self.file_name
+        curr_path = self.rel_path + '\\' + self.file_name
+        if platform != 'Win32':
+            curr_path.replace('\\', '/')
+        return curr_path
 
     def get_list_checksums(self):
         pass
@@ -47,7 +52,10 @@ class File:
         return self.file_name
 
     def get_rel_path_name(self):
-        return self.rel_path + '\\' + self.file_name
+        curr_path = self.rel_path + '\\' + self.file_name
+        if platform != 'Win32':
+            curr_path.replace('\\', '/')
+        return curr_path
 
     def get_rel_path(self):
         return self.rel_path

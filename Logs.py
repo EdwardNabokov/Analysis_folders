@@ -34,6 +34,5 @@ class Logs:
 
     def compare(self):
         if len(self.compare_files()) == 0 and len(self.compare_folders()) == 0:
-            print('Folders are equal')
-            return 'hah', 'llf'
+            return None, None
         return self.compare_folders(), self.compare_files()

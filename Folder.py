@@ -26,6 +26,7 @@ class Folder:
                     key = rel_path + '\\' + file
                 if platform != 'Win32':
                     key.replace('\\', '/')
+                    rel_path.replace('\\', '/')
                 self.log_file[key] = File(rel_path, self.base_path + key)
 
     def get_log_file(self):
@@ -58,7 +59,10 @@ class Folder:
         """
         try:
             print('file_object.get_file_path() ->', file_object.get_file_path())
-            f = open(self.base_path + '\\' + file_object.get_file_path(), 'wb+')
+            curr_path = self.base_path + '\\' + file_object.get_file_path()
+            if platform != 'Win32':
+                curr_path.replace('\\', '/')
+            f = open(curr_path, 'wb+')
             f.write(file)
             f.close()
             if os.path.exists(file_object.get_file_path()):

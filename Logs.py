@@ -1,4 +1,3 @@
-
 class Logs:
 
     def __init__(self, log_first, log_second):
@@ -19,9 +18,7 @@ class Logs:
         print(result2)
         for key_path in list(result2):
             if self.log_first[key_path] != self.log_second[key_path]:
-                print(self.log_first[key_path].get_file_name())
-                print(self.log_second[key_path].get_file_name())
-                print('Files are equal')
+                pass
         # absent_files = [key for key in self.log_second.keys()]
         return list(absent_files)
 

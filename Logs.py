@@ -33,6 +33,4 @@ class Logs:
         return sorted(absent_folders_paths)
 
     def compare(self):
-        if len(self.compare_files()) == 0 and len(self.compare_folders()) == 0:
-            return None, None
         return self.compare_folders(), self.compare_files()

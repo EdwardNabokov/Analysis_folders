@@ -9,13 +9,15 @@ class HandlerMessage:
         self.info = info
         self.folder_my = folder_my
         self.out_queue = out_queue
-        message_response = {
+        self.message_response = {
             '__GET_LOG__': self.get_log,
             '__GET_FILE__': self.get_file,
             '__SEND_LOG__': self.send_log,
             '__SEND_FILE__': self.send_file
         }
-        message_response[self.info[0]]()
+
+    def run(self):
+        return self.message_response[self.info[0]]()
 
     def get_log(self):
         a = Message()
@@ -30,14 +32,16 @@ class HandlerMessage:
         return answer
 
     def send_log(self):
+        print('My_log ', self.folder_my.get_log_file())
         difference = Logs(self.folder_my.get_log_file(), self.info[1]).compare()
         self.folder_my.create_folders(difference[0])
+        print(difference)
         msg = Message()
         for file_path in difference[1]:
             self.out_queue.put(msg.get_file(file_path))
         return None
 
     def send_file(self):
-        print('Here ', self.info[1])
+        print('Got file from another computer ', self.info[1])
         self.folder_my.create_file(self.info[1], self.info[2])
         return None

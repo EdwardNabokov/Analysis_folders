@@ -27,7 +27,7 @@ class Analyzer:
             if self.in_queue.empty():
                 time.sleep(3)
             else:
-                answer = HandlerMessage(self.in_queue.get(), self.folder, self.out_queue)
+                answer = HandlerMessage(self.in_queue.get(), self.folder, self.out_queue).run()
                 if answer is not None:
                     self.out_queue.put(answer)
 
@@ -35,14 +35,18 @@ class Analyzer:
 if __name__ == '__main__':
     test = File('\\', 'C:\\Users\\Edward\\Desktop\\test4\\TJ.pdf')
     test2 = File('\\', 'C:\\Users\\Edward\\Desktop\\test4\\merged.pdf')
+    test3 = File('\\', 'C:\\Users\\Edward\\Desktop\\test4\\hehee.txt')
+    test4 = File('fromNabokovFILE\\', 'C:\\Users\\Edward\\Desktop\\test4\\fromNabokovFILE\\NabokovTExt.txt')
     folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
 
     msg = Message()
     b = Queue()
     b.put(msg.send_log(folder_another.get_log_file()))
-    print('Mdg ', test.get_rel_path_name())
     b.put(msg.send_file(test.get_rel_path_name(), test.get_file()))
     b.put(msg.send_file(test2.get_rel_path_name(), test2.get_file()))
+    b.put(msg.send_file(test3.get_rel_path_name(), test3.get_file()))
+    b.put(msg.send_file(test4.get_rel_path_name(), test4.get_file()))
+
     c = Queue()
     a = Analyzer('C:\\Users\\Edward\\Desktop\\test', b, c)
     a.run()

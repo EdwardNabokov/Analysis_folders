@@ -16,7 +16,8 @@ class File:
         """
         self.block_size = block_size
         self.file_path = file_path
-        self.rel_path = rel_path
+        self.rel_path = os.sep + os.sep.join(rel_path.split(os.sep)[:-1])
+        print('Rel_path ', self.rel_path)
         self.file_name = os.path.basename(file_path)
         self.size_of_file = os.path.getsize(self.file_path)
         self.amount_of_blocks = self.size_of_file / self.block_size
@@ -41,10 +42,6 @@ class File:
 
     def get_file_path(self):
         curr_path = self.file_path
-        if platform != 'win32':
-            curr_path = curr_path.replace('\\', '/')
-        else:
-            curr_path = curr_path.replace('/', '\\')
         return curr_path
 
     def get_list_checksums(self):
@@ -54,11 +51,7 @@ class File:
         return self.file_name
 
     def get_rel_path_name(self):
-        curr_path = self.rel_path + '\\' + self.file_name
-        if platform != 'win32':
-            curr_path = curr_path.replace('\\', '/')
-        else:
-            curr_path = curr_path.replace('/', '\\')
+        curr_path = self.rel_path + os.sep + self.file_name
         return curr_path
 
     def get_rel_path(self):

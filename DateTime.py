@@ -9,7 +9,6 @@ response = c.request('europe.pool.ntp.org', version=3)
 current_time = datetime.strptime(datetime.fromtimestamp(response.tx_time).
                                  strftime('%a %b %d %H:%M:%S %Y'), "%a %b %d %H:%M:%S %Y")
 
-
 class DateTime:
 
     def __init__(self, path):

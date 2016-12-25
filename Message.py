@@ -12,7 +12,7 @@ class Message:
 
     def get_log(self):
         command = commands[0]
-        return command, ''
+        return command, 0
 
     def send_log(self, my_log):
         command = commands[1]

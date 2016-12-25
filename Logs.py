@@ -25,6 +25,7 @@ class Logs:
     def compare_folders(self):
         first_set = [value.get_rel_path() for value in self.log_first.values()]
         second_set = [value.get_rel_path() for value in self.log_second.values()]
+
         absent_folders_paths = set(second_set) - set(first_set)
         # absent_folder = [value[1] for value in self.log_second.values()]
         if len(absent_folders_paths) == 0 and len(self.log_second.values()) == 0:

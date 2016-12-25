@@ -17,15 +17,23 @@ class Folder:
         self.log_folder_copy = {}
         self.folder_name = os.path.basename(self.base_path)
         self.key = ''
+        print(self.base_path)
         for root, directories, files in os.walk(self.base_path):
             for file in files:
                 if file[0] == '.':
                     continue
-                rel_folder = [self.folder_name] + root[len(self.base_path):].split(os.sep)[1:]
-                rel_folder.append(file)
-                print('ww ',os.sep + os.path.join(*rel_folder[1:]))
-                self.log_folder[os.path.join(*(rel_folder[1:]))] = File(os.path.join(*rel_folder[1:]), root + os.sep + file)
-        print('MY_LOOOOG -> ', self.log_folder)
+                rel_path = root[len(self.base_path):].split(os.sep)[1:]
+                rel_path.append(file)
+
+                if not rel_path[:-1]:
+                    middle = ['','']
+                else:
+                    middle = rel_path[:-1]
+                print(os.sep.join(middle))
+                print(middle)
+                self.log_folder[tuple(rel_path)] = File(os.sep.join(middle), os.path.join(self.base_path, *rel_path))
+        print(self.log_folder)
+
 
     def put_log_folder(self, log):
         self.log_folder = log
@@ -51,8 +59,8 @@ class Folder:
             for path_to_folder in path_to_folders:
                 print('Path to folder: ', path_to_folder)
 
-                if not os.path.exists(self.base_path + path_to_folder):
-                    os.makedirs(self.base_path + path_to_folder)
+                if not os.path.exists(self.base_path + os.sep + path_to_folder):
+                    os.makedirs(self.base_path + os.sep + path_to_folder)
                     print("Created!")
         except:
             print("Something went wrong!")
@@ -86,4 +94,4 @@ class Folder:
         self.create_folders(folders_an_files[0])
         # self.create_files(folders_an_files[1], )
 
-#Folder('C:\\Users\\Edward\\Desktop\\test4\\')
+# Folder('C:\\Users\\Edward\\Desktop\\test4')

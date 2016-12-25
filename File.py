@@ -16,8 +16,7 @@ class File:
         """
         self.block_size = block_size
         self.file_path = file_path
-        self.rel_path = os.sep + os.sep.join(rel_path.split(os.sep)[:-1])
-        print('Rel_path ', self.rel_path)
+        self.rel_path = rel_path
         self.file_name = os.path.basename(file_path)
         self.size_of_file = os.path.getsize(self.file_path)
         self.amount_of_blocks = self.size_of_file / self.block_size

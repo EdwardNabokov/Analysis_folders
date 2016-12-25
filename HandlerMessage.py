@@ -35,7 +35,7 @@ class HandlerMessage:
         print('My_log ', self.folder_my.get_log_file())
         difference = Logs(self.folder_my.get_log_file(), self.info[1]).compare()
         self.folder_my.create_folders(difference[0])
-        print(difference)
+        print('FOLDERS ', difference[0])
         msg = Message()
         for file_path in difference[1]:
             self.out_queue.put(msg.get_file(file_path))

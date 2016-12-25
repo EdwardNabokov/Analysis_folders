@@ -33,9 +33,9 @@ class Analyzer:
 
 
 if __name__ == '__main__':
-    test = File('\\', 'C:\\Users\\Edward\\Desktop\\test4\\TJ.pdf')
-    test2 = File('\\', 'C:\\Users\\Edward\\Desktop\\test4\\merged.pdf')
-    test4 = File('fromNabokovFILE\\', 'C:\\Users\\Edward\\Desktop\\test4\\fromNabokovFILE\\NabokovTExt.txt')
+    test = File('', 'C:\\Users\\Edward\\Desktop\\test4\\TJ.pdf')
+    test2 = File('', 'C:\\Users\\Edward\\Desktop\\test4\\merged.pdf')
+    test4 = File('\\fromNabokovFILE', 'C:\\Users\\Edward\\Desktop\\test4\\fromNabokovFILE\\NabokovTExt.txt')
     folder_another = Folder('C:\\Users\\Edward\\Desktop\\test4')
 
     msg = Message()

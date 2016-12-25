@@ -73,18 +73,12 @@ class Folder:
         :param file: file (in bytes)
         """
         try:
-            # print('file_object.get_file_path() ->', rel_file_path)
+            print('file_object.get_file_path() ->', self.base_path + rel_file_path)
 
-            if platform != 'win32':
-                rel_file_path = rel_file_path.replace('\\', '/')
-                cur_path = self.base_path + rel_file_path[1:]
-            else:
-                rel_file_path = rel_file_path.replace('/', '\\')
-                cur_path = self.base_path + rel_file_path
-            f = open(cur_path, 'wb+')
+            f = open(self.base_path + rel_file_path, 'wb+')
             f.write(file)
             f.close()
-            if os.path.exists(rel_file_path):
+            if os.path.exists(self.base_path + rel_file_path):
                 print('created')
         except:
             print("Files weren't delivered")

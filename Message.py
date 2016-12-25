@@ -1,6 +1,6 @@
 
 commands = ['__GET_LOG__', '__SEND_LOG__', '__GET_FILE__', '__SEND_FILE__',
-            '__GET_BLOCK__', '__SEND_BLOCK__']
+            '__GET_BLOCK__', '__SEND_BLOCK__', '__CREATE_FILE__', '__APPEND_TO_FILE__']
 
 
 class Message:
@@ -33,3 +33,11 @@ class Message:
     def send_block(self, block):
         command = commands[5]
         return command, block
+
+    def create_file(self, path):
+        command = commands[6]
+        return command, path
+
+    def append_to_file(self, path, data):
+        command = commands[7]
+        return command, path, data

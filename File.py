@@ -2,7 +2,6 @@ from Block import Block
 from DateTime import DateTime
 import os
 import math
-from sys import platform
 
 
 class File:
@@ -97,7 +96,8 @@ class File:
 
     def get_file(self):
         with open(self.full_path, 'rb') as opened:
-                return bytes(opened.read())
+            for line in opened:
+                yield line
 
     def __repr__(self):
         return str(self.rel_path)

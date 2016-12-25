@@ -23,12 +23,9 @@ class Analyzer:
         self.out_queue.put(msg.get_log())
         while True:
             if self.in_queue.empty():
-                time.sleep(3)
+                time.sleep(0.1)
             else:
                 answer = HandlerMessage(self.in_queue.get(), self.folder, self.out_queue).run()
-                print(answer)
-                if answer is not None:
-                    self.out_queue.put(answer)
 
 
 if __name__ == '__main__':

@@ -27,6 +27,8 @@ class Folder:
             for dir in directories:
                 self.folders.append(tuple(os.path.join(root[len(self.base_path):], dir).split(os.sep)))
             for file in ifiles:
+               if file[0] == '.':
+                   continue
                self.files.append(File(tuple(os.path.join(root[len(self.base_path):], file).split(os.sep)), self.base_path))
 
     def create_log(self):
@@ -96,3 +98,6 @@ class Folder:
         except:
             pass
 
+    def append_to_file(self, path, data):
+        with open(os.path.join(self.base_path, *path), 'ab') as f:
+            f.write(data)

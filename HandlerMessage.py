@@ -13,7 +13,9 @@ class HandlerMessage:
             '__GET_LOG__': self.get_log,
             '__GET_FILE__': self.get_file,
             '__SEND_LOG__': self.send_log,
-            '__SEND_FILE__': self.send_file
+            '__SEND_FILE__': self.send_file,
+            '__CREATE_FILE__': self.create_file,
+            '__APPEND_TO_FILE__': self.append_to_file,
         }
 
     def run(self):
@@ -22,30 +24,28 @@ class HandlerMessage:
     def get_log(self):
         a = Message()
         answer = self.folder_my.get_log_file()
-        return a.send_log(answer)
+        self.out_queue.put(a.send_log(answer))
 
     def get_file(self):
-        a = Message()
-        current_file_path = self.info[1]
-        # print('Info: ', self.info)
-        current_file_object = self.folder_my.get_file(current_file_path)
-        answer = a.send_file(current_file_path, current_file_object.get_file())
-        return answer
+        path = self.info[1]
+        self.out_queue.put(Message().create_file(self.info[1]))
+        with open(self.folder_my.get_file(path).full_path, 'rb') as f:
+            data = f.read(1048576)
+            self.out_queue.put(Message().append_to_file(path, data))
 
     def send_log(self):
-        difference_folders = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_folders()
-        for i in difference_folders:
-            # print('Different_folder ', os.path.join(*i))
+        different_folders = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_folders()
+        different_files = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_files()
+        for i in different_folders:
             self.folder_my.create_folder(i)
-
-        difference_files = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_files()
-        msg = Message()
-        for i in difference_files:
-            # print('I_sdf ', os.path.join(*i))
-            self.out_queue.put(msg.get_file(i))
-        return None
+        for i in different_files:
+            self.out_queue.put(Message().get_file(i))
 
     def send_file(self):
-        # print('Here ', self.info)
         self.folder_my.create_file(self.info[1], self.info[2])
-        return None
+
+    def create_file(self):
+        self.folder_my.create_file(self.info[1], '')
+
+    def append_to_file(self):
+        self.folder_my.append_data(self.info[1], self.info[2])

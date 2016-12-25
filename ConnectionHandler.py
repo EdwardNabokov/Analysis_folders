@@ -1,11 +1,8 @@
 import curio
 import threading
-import time
 import logging
-import pickle
 from queue import Queue
 from Connection import Connection
-from CommandHandler import CommandHandler
 from Analyzer import Analyzer
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,7 +47,6 @@ class ConnectionHandler:
             package = await self.connection.receive_message()
             print('Receive: ', package)
             self.receive.put(package)
-            print('put message')
 
     async def sendHandler(self):
         """
@@ -68,4 +64,4 @@ class ConnectionHandler:
 
 if __name__ == '__main__':
     curio.run(
-        ConnectionHandler.runHandler('new_connection', ('172.1.1.120', 55592), '/Users/Alexander/Google/'))
+        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 61067), '/Users/Alexander/untitled/'))

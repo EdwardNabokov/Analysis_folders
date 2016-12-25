@@ -49,7 +49,6 @@ class Connection:
                 return None
             data += packet
         logger.debug("Receive message from {}:{}".format(*self.addr))
-        print(type(pickle.loads(data)))
         return pickle.loads(data)
 
     async def send_message(self, data):
@@ -57,6 +56,7 @@ class Connection:
 		Create message from raw data and send to the client
 		message -> (len(data):data)
 		"""
+        print(data)
         data = pickle.dumps(data)
         try:
             message = struct.pack('>I', len(data)) + data

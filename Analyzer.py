@@ -1,7 +1,6 @@
 from Folder import Folder
-from Message import Message, commands
+from Message import Message
 from HandlerMessage import HandlerMessage
-from File import File
 from Logs import *
 from queue import *
 import time

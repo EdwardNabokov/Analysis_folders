@@ -7,7 +7,7 @@ from sys import platform
 
 class File:
 
-    def __init__(self, rel_path, file_path, block_size=1024):
+    def __init__(self, rel_path, file_base, block_size=1024):
         """
         initialize essential parameters
         :param rel_path: it's path EXACTLY from the current folder (Example: ..//test)
@@ -15,12 +15,13 @@ class File:
         :param block_size: 1024 by default
         """
         self.block_size = block_size
-        self.file_path = file_path
+        self.file_base = file_base
         self.rel_path = rel_path
-        self.file_name = os.path.basename(file_path)
-        self.size_of_file = os.path.getsize(self.file_path)
+        self.file_name = self.rel_path[-1]
+        self.full_path = os.path.join(self.file_base, *self.rel_path)
+        self.size_of_file = os.path.getsize(self.full_path)
         self.amount_of_blocks = self.size_of_file / self.block_size
-        self.time_of_modification = DateTime(self.file_path).get_time_modification()
+        self.time_of_modification = DateTime(self.full_path).get_time_modification()
         self.list_blocks_checksums = [value.simple_checksum for i, value in enumerate(self._iterator_block_list())]
 
     def __eq__(self, other):
@@ -36,25 +37,15 @@ class File:
                     pass
                     #print('Block with position {} are different'.format(i))
 
-    def file_name(self):
+    def get_file_name(self):
         return self.file_name
 
-    def get_file_path(self):
-        curr_path = self.file_path
+    def get_rel_path(self):
+        curr_path = self.rel_path
         return curr_path
 
     def get_list_checksums(self):
         pass
-
-    def get_file_name(self):
-        return self.file_name
-
-    def get_rel_path_name(self):
-        curr_path = self.rel_path + os.sep + self.file_name
-        return curr_path
-
-    def get_rel_path(self):
-        return self.rel_path
 
     def get_block_size(self):
         return self.block_size
@@ -97,7 +88,7 @@ class File:
         :return: block
         """
         i = 0
-        with open(self.file_path, 'rb') as file:
+        with open(self.full_path, 'rb') as file:
             block = Block(i, file.read(self.block_size))
             while block.get_block() != b'':
                 yield block
@@ -105,5 +96,8 @@ class File:
                 block = Block(i, file.read(self.block_size))
 
     def get_file(self):
-        with open(self.file_path, 'rb') as opened:
+        with open(self.full_path, 'rb') as opened:
                 return bytes(opened.read())
+
+    def __repr__(self):
+        return str(self.rel_path)

@@ -40,5 +40,5 @@ class ListenServer:
 			await curio.spawn(connection.runHandler(name, self.addr, self.path, self.client))
 
 if __name__ == '__main__':
-	server = ListenServer('C:\\Users\\Edward\\Desktop\\test4')
+	server = ListenServer('/Users/Alexander/Google/')
 	curio.run(server.start())

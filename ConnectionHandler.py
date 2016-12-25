@@ -68,4 +68,4 @@ class ConnectionHandler:
 
 if __name__ == '__main__':
     curio.run(
-        ConnectionHandler.runHandler('new_connection', ('172.1.1.121', 55929), 'C:\\Users\\Edward\\Desktop\\test4\\'))
+        ConnectionHandler.runHandler('new_connection', ('172.1.1.120', 55592), '/Users/Alexander/Google/'))

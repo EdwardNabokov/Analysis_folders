@@ -56,6 +56,7 @@ class Folder:
             for folder in path_to_folder:
                 a.append(folder)
                 if tuple(a) not in self.folders:
+                    print(self.base_path + os.path.join(*a))
                     os.makedirs(self.base_path + os.path.join(*a))
                     self.folders.append(a)
                     print("Created!")
@@ -94,5 +95,4 @@ class Folder:
                     break
         except:
             pass
-
 

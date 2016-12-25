@@ -10,7 +10,7 @@ class File:
     def __init__(self, rel_path, file_base, block_size=1024):
         """
         initialize essential parameters
-        :param rel_path: it's path EXACTLY from the current folder (Example: ..//test)
+        :param rel_path: tuple ( folder[,folder], file_name )
         :param file_path: it's path from its root (Example: C://Downloads//test)
         :param block_size: 1024 by default
         """

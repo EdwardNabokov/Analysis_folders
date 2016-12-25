@@ -1,6 +1,6 @@
 from Message import Message
-from Folder import Folder
 from Logs import Logs
+import os
 
 
 class HandlerMessage:
@@ -27,21 +27,25 @@ class HandlerMessage:
     def get_file(self):
         a = Message()
         current_file_path = self.info[1]
+        # print('Info: ', self.info)
         current_file_object = self.folder_my.get_file(current_file_path)
         answer = a.send_file(current_file_path, current_file_object.get_file())
         return answer
 
     def send_log(self):
-        print('My_log ', self.folder_my.get_log_file())
-        difference = Logs(self.folder_my.get_log_file(), self.info[1]).compare()
-        self.folder_my.create_folders(difference[0])
-        print('FOLDERS ', difference[0])
+        difference_folders = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_folders()
+        for i in difference_folders:
+            # print('Different_folder ', os.path.join(*i))
+            self.folder_my.create_folder(i)
+
+        difference_files = Logs(self.folder_my.get_log_file(), self.info[1]).cmp_files()
         msg = Message()
-        for file_path in difference[1]:
-            self.out_queue.put(msg.get_file(file_path))
+        for i in difference_files:
+            # print('I_sdf ', os.path.join(*i))
+            self.out_queue.put(msg.get_file(i))
         return None
 
     def send_file(self):
-        print('Got file from another computer ', self.info[1])
+        # print('Here ', self.info)
         self.folder_my.create_file(self.info[1], self.info[2])
         return None

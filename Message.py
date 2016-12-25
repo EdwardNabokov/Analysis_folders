@@ -1,43 +1,33 @@
-
-commands = ['__GET_LOG__', '__SEND_LOG__', '__GET_FILE__', '__SEND_FILE__',
-            '__GET_BLOCK__', '__SEND_BLOCK__', '__CREATE_FILE__', '__APPEND_TO_FILE__']
+import pickle
 
 
 class Message:
 
-    def __init__(self):
-        self.my_ip = ''
-        self.other_ip = ''
-        self.path_folder = ''
+    def __init__(self, command, meta, data):
+        self.command = pickle.dumps(command)
+        self.meta = pickle.dumps(meta)
+        if type(data) == str:
+            self.data = b''
+        else:
+            self.data = data
 
-    def get_log(self):
-        command = commands[0]
-        return command, 0
+    def command_size(self):
+        return len(self.command)
 
-    def send_log(self, my_log):
-        command = commands[1]
-        return command, my_log
+    def meta_size(self):
+        return len(self.meta)
 
-    def get_file(self, rel_path_file):
-        command = commands[2]
-        return command, rel_path_file
+    def data_size(self):
+        return len(self.data)
 
-    def send_file(self, rel_path_file, file):
-        command = commands[3]
-        return command, rel_path_file, file
+    def decode_command(self):
+        return pickle.loads(self.command)
 
-    def get_block(self, block_obj):
-        command = commands[4]
-        return command, block_obj
+    def decode_meta(self):
+        return pickle.loads(self.meta)
 
-    def send_block(self, block):
-        command = commands[5]
-        return command, block
+    def total_size(self):
+        return self.command_size() + self.meta_size() + self.data_size()
 
-    def create_file(self, path):
-        command = commands[6]
-        return command, path
-
-    def append_to_file(self, path, data):
-        command = commands[7]
-        return command, path, data
+    def __str__(self):
+        return "{}\t-\t{}".format(self.decode_command(), self.decode_meta())

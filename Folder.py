@@ -79,14 +79,13 @@ class Folder:
         :param file: file (in bytes)
         """
         try:
-            self.create_folder(rel_file_path[:-1])
             with open(os.path.join(self.base_path, *rel_file_path), 'wb+') as f:
                 f.write(file)
             self.files.append(File(rel_file_path, self.base_path))
             if not os.path.exists(self.base_path + os.path.join(*rel_file_path)):
                 print('Error while creating file')
         except:
-            print("Files weren't delivered")
+            pass
 
     def remove_file(self, path_to_file):
         try:

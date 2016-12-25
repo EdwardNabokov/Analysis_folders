@@ -32,40 +32,75 @@ class Connection:
         logger.debug("Connection with {} initializes: {}:{}".format(self.name, *self.addr))
         return self
 
+    def __create_message(self, message):
+        msg_format = "!L{}sL{}sL{}s".format(message.command_size(), message.meta_size(), message.data_size())
+        msg = struct.Struct(msg_format)
+        msg = msg.pack(message.command_size(), message.command, message.meta_size(),
+                       message.meta, message.data_size(), message.data)
+        return msg
+
     async def receive_message(self):
         """
 		Receive message with such protocol:
-		message -> length:data
+		command
+		meta
+		data
 		"""
-        # Receive length of message
-        raw_length = await self.client.recv(4)
-        length = struct.unpack('>I', raw_length)[0]
+        m = Message('', '', '')
+        # Receive length of command
+        length = await self.client.recv(4)
+        command_length = struct.unpack('>I', length)[0]
+
         data = b''
         # Read until all data pi pieces
-        while len(data) != length:
-            packet = await self.client.recv(length - len(data))
+        while len(data) != command_length:
+            packet = await self.client.recv(command_length - len(data))
             if not packet:
                 logger.debug("Receive bad message from {}:{}".format(*self.addr))
                 return None
             data += packet
-        logger.debug("Receive message from {}:{}".format(*self.addr))
-        return pickle.loads(data)
+        m.command = data
 
-    async def send_message(self, data):
+        length = await self.client.recv(4)
+        meta_length = struct.unpack('>I', length)[0]
+        data = b''
+        # Read until all data pi pieces
+        while len(data) != meta_length:
+            packet = await self.client.recv(meta_length - len(data))
+            if not packet:
+                logger.debug("Receive bad message from {}:{}".format(*self.addr))
+                return None
+            data += packet
+        m.meta = data
+
+        length = await self.client.recv(4)
+        data_length = struct.unpack('>I', length)[0]
+        data = b''
+        # Read until all data pi pieces
+        while len(data) != data_length:
+            packet = await self.client.recv(data_length - len(data))
+            if not packet:
+                logger.debug("Receive bad message from {}:{}".format(*self.addr))
+                return None
+            data += packet
+        m.data = data
+
+        logger.debug("Receive message from {}:{}".format(*self.addr))
+        return m
+
+    async def send_message(self, message):
         """
 		Create message from raw data and send to the client
 		message -> (len(data):data)
 		"""
-        print(data)
-        data = pickle.dumps(data)
+        data = self.__create_message(message)
         try:
-            message = struct.pack('>I', len(data)) + data
-            await self._send_bytes(message)
+            await self._send_bytes(data)
         except KeyboardInterrupt:
             raise
-        except:
+        except Exception as e:
             logger.debug("Error while creating message")
-            logger.debug(pickle.loads(data))
+            logger.error('Failed : ' + str(e))
             pass
         logger.debug("Send message to {}:{}".format(*self.addr))
 
@@ -78,7 +113,7 @@ class Connection:
         send = 0
         send += await self.client.send(data)
         while len(data) - send != 0:
-            send += await self.s.send(data[send:])
+            send += await self.client.send(data[send:])
 
     def close(self):
         self.sock.close()

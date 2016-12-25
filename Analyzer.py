@@ -17,13 +17,13 @@ class Analyzer:
         self.another_log_copy = {}
 
     def run(self):
-        msg = Message()
         self.folder = Folder(self.path_to_folder)
         self.my_log = self.folder.get_log_file()
-        self.out_queue.put(msg.get_log())
+        self.out_queue.put(Message('__GET_LOG__', '', ''))
         while True:
             if self.in_queue.empty():
-                time.sleep(0.1)
+                print('Queue is empty')
+                time.sleep(1)
             else:
                 answer = HandlerMessage(self.in_queue.get(), self.folder, self.out_queue).run()
 

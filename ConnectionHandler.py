@@ -4,6 +4,7 @@ import logging
 from queue import Queue
 from Connection import Connection
 from Analyzer import Analyzer
+from Message import Message
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('handler')
@@ -58,10 +59,9 @@ class ConnectionHandler:
             item = await curio.abide(self.send.get)
             if item:
                 print('Send: ', item)
-                await curio.sleep(0.01)
                 await self.connection.send_message(item)
 
 
 if __name__ == '__main__':
     curio.run(
-        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 50009), '/Users/Alexander/untitled/'))
+        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 50593), '/Users/Alexander/untitled/'))

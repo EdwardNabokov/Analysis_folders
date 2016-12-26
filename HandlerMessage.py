@@ -17,7 +17,8 @@ class HandlerMessage:
         }
 
     def run(self):
-        return self.message_response[self.message.decode_command()]()
+        if self.message.decode_command() in self.message_response.keys():
+            return self.message_response[self.message.decode_command()]()
 
     def get_log(self):
         answer = self.folder_my.get_log_file()
@@ -28,7 +29,7 @@ class HandlerMessage:
         self.out_queue.put(Message('__CREATE_FILE__', self.message.decode_meta(), ''))
         with open(self.folder_my.get_file(path).full_path, 'rb') as f:
             while True:
-                data = f.read(102400)
+                data = f.read(10240)
                 if data:
                     self.out_queue.put(Message('__APPEND_TO_FILE__', self.message.decode_meta(), data))
                 else:

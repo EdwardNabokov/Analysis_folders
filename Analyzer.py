@@ -22,6 +22,7 @@ class Analyzer:
             try:
                 item = self.in_queue.get()
                 HandlerMessage(item, self.folder, self.out_queue).run()
+                self.out_queue.join()
             except Empty:
                 pass
 

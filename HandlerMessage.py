@@ -17,7 +17,8 @@ class HandlerMessage:
         }
 
     def run(self):
-        return self.message_response[self.message.decode_command()]()
+        if self.message.decode_command() in self.message_response.keys():
+            return self.message_response[self.message.decode_command()]()
 
     def get_log(self):
         answer = self.folder_my.get_log_file()

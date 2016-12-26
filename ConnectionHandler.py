@@ -1,65 +1,74 @@
-import curio
-import threading
+import asyncio
 import logging
-from queue import Queue
+import janus
+import threading
 from Connection import Connection
 from Analyzer import Analyzer
+from Message import Message
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('handler')
 
-
 class ConnectionHandler:
     """
-	Create connection with computer and run
-	continuous process of listening and receiving data
-	"""
-
+    Create connection with computer and run
+    continuous process of listening and receiving data
+    """
     @classmethod
-    async def runHandler(cls, name, addr, path, client=None):
+    async def runHandler(cls, loop, addr, path, client=None):
         logger.debug("Start connection handler")
         self = ConnectionHandler()
-        self.name = name
-        self.connection = await Connection.create_connection(name, addr, client)
+        self.loop = loop
+        self.addr = addr
+        self.connection = await Connection.create_connection(loop, addr, client)
 
         # Queues keep received messages and messages to send
-        self.send = Queue()
-        self.receive = Queue()
+        self.send = janus.Queue(loop=self.loop)
+        self.receive = janus.Queue(loop=self.loop)
+
         # Path to sync folder
         self.path = path
         # Run analyzer
-        analyzer = Analyzer(path, self.receive, self.send)
+        analyzer = Analyzer(path, self.receive.sync_q, self.send.sync_q)
         threading.Thread(target=analyzer.run).start()
 
         # Continuos listening and receiving packages
-        await curio.spawn(self.listenHandler())
-        await curio.spawn(self.sendHandler())
+        asyncio.ensure_future(self.listenHandler())
+        asyncio.ensure_future(self.sendHandler())
 
         return self
 
+
     async def listenHandler(self):
         """
-		Listen for comming messages and 
-		put them to the queue
-		"""
+        Listen for comming messages and
+        put them to the queue
+        """
         logger.debug("Listen handler started")
         while True:
             package = await self.connection.receive_message()
-            self.receive.put(package)
+            print('Receive: ', package)
+            await self.receive.async_q.put(package)
 
     async def sendHandler(self):
         """
-		Take messages from queue and 
-		send them
-		"""
+        Take messages from queue and
+        send them
+        """
         logger.debug("Send handler started")
         while True:
-            item = await curio.abide(self.send.get)
+            item = await self.send.async_q.get()
             if item:
-                curio.sleep(0.01)
+                print('Send: ', item)
                 await self.connection.send_message(item)
 
 
 if __name__ == '__main__':
-    curio.run(
-        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 63048), '/Users/Alexander/untitled/'))
+    loop = asyncio.get_event_loop()
+    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 8898), '/Users/Alexander/untitled/'))
+    server = loop.run_until_complete(coro)
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        print('Closing connection')
+    loop.close() 

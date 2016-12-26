@@ -1,35 +1,27 @@
 import logging
+import asyncio
 import struct
-import pickle
-from curio.socket import *
 from Message import Message
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('Connection')
 
-
 class Connection:
-    """
-	Initialize connection to computer
-	implement base methods for data transfer
-	"""
-
     @classmethod
-    async def create_connection(cls, name, addr, client=None):
+    async def create_connection(cls, loop, addr, client=None):
         """
-		Initialize connection by socket or address
-		"""
+        Initialize connection by socket or address
+        """
         self = Connection()
-        self.name = name
+        self.loop = loop
         self.addr = addr
         # If direct socket is't given
         if not client:
-            self.client = socket(AF_INET, SOCK_STREAM)
-            await self.client.connect(addr)
+            self.reader, self.writer = await asyncio.open_connection(self.addr[0], self.addr[1], loop=self.loop)
         # Create connection by address
         else:
-            self.client = client
-        logger.debug("Connection with {} initializes: {}:{}".format(self.name, *self.addr))
+            self.reader, self.writer = client
+        logger.debug("Connection with {}:{} initialized".format(*self.addr))
         return self
 
     def __create_message(self, message):
@@ -39,46 +31,47 @@ class Connection:
                        message.meta, message.data_size(), message.data)
         return msg
 
+
     async def receive_message(self):
         """
-		Receive message with such protocol:
-		command
-		meta
-		data
-		"""
+        Receive message with such protocol:
+        command
+        meta
+        data
+        """
         m = Message('', '', '')
         # Receive length of command
-        length = await self.client.recv(4)
+        length = await self.reader.read(4)
         command_length = struct.unpack('>I', length)[0]
 
         data = b''
         # Read until all data pi pieces
         while len(data) != command_length:
-            packet = await self.client.recv(command_length - len(data))
+            packet = await self.reader.read(command_length - len(data))
             if not packet:
                 logger.debug("Receive bad message from {}:{}".format(*self.addr))
                 return None
             data += packet
         m.command = data
 
-        length = await self.client.recv(4)
+        length = await self.reader.read(4)
         meta_length = struct.unpack('>I', length)[0]
         data = b''
         # Read until all data pi pieces
         while len(data) != meta_length:
-            packet = await self.client.recv(meta_length - len(data))
+            packet = await self.reader.read(meta_length - len(data))
             if not packet:
                 logger.debug("Receive bad message from {}:{}".format(*self.addr))
                 return None
             data += packet
         m.meta = data
 
-        length = await self.client.recv(4)
+        length = await self.reader.read(4)
         data_length = struct.unpack('>I', length)[0]
         data = b''
         # Read until all data pi pieces
         while len(data) != data_length:
-            packet = await self.client.recv(data_length - len(data))
+            packet = await self.reader.read(data_length - len(data))
             if not packet:
                 logger.debug("Receive bad message from {}:{}".format(*self.addr))
                 return None
@@ -90,31 +83,17 @@ class Connection:
 
     async def send_message(self, message):
         """
-		Create message from raw data and send to the client
-		message -> (len(data):data)
-		"""
+        Create message from raw data and send to the client
+        message -> (len(data):data)
+        """
         data = self.__create_message(message)
         try:
-            await self._send_bytes(data)
-        except KeyboardInterrupt:
-            raise
+            self.writer.write(data)
+            await self.writer.drain()
         except Exception as e:
             logger.debug("Error while creating message")
             logger.error('Failed : ' + str(e))
             pass
         logger.debug("Send message to {}:{}".format(*self.addr))
 
-    async def _send_bytes(self, data):
-        """
-		Handle sending data, if not all data was send
-		repeat cycle again trying to send rest of the data
-		"""
-        data = data
-        send = 0
-        send += await self.client.send(data)
-        while len(data) - send != 0:
-            send += await self.client.send(data[send:])
 
-    def close(self):
-        self.sock.close()
-        logger.debug("Connection closed with {}:{}".format(*self.addr))

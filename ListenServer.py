@@ -1,44 +1,33 @@
-import curio
+import asyncio
 import logging
-from curio import Queue
-from curio.socket import *
 from ConnectionHandler import ConnectionHandler
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('server')
 
-
 class ListenServer:
-	"""
-	Create server that listen to connection and
-	run handleConnection after connection made
-	address: tuple (ip, port)
-	"""
-	def __init__(self, path):
-		self.sock = socket(AF_INET, SOCK_STREAM)
-		self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-		self.sock.bind(('', 0))
-		self.sock.listen(5)
 
-		self.path = path
+    def __init__(self, loop, path):
+        # logger.debug("Start listening server: {}:{}".format(*self.sock.getsockname()))
+        self.loop = loop
+        self.path = path
 
-		logger.debug("Start listening server: {}:{}".format(*self.sock.getsockname()))
-		print(self.sock.getsockname())
+    def start(self, reader, writer):
+        addr = writer.get_extra_info('peername')
+        asyncio.ensure_future(self.runHandler(addr, (reader, writer)))
 
-	async def start(self):
-		"""
-		Servers starts listen
-		"""
-		while True:
-			self.client, self.addr = await self.sock.accept()
+    async def runHandler(self, addr, transport):
+        connection = ConnectionHandler()
+        await connection.runHandler(self.loop, addr, self.path, transport)
 
-			# Create name of connection (ip,port)
-			name = self.addr[0] + ':' + str(self.addr[1])
-
-			# Redirect made connection to handler
-			connection = ConnectionHandler()
-			await curio.spawn(connection.runHandler(name, self.addr, self.path, self.client))
 
 if __name__ == '__main__':
-	server = ListenServer('/Users/Alexander/Google/')
-	curio.run(server.start())
+    loop = asyncio.get_event_loop()
+    a = ListenServer(loop, '/Users/Alexander/Google/')
+    coro = asyncio.start_server(a.start, '127.0.0.1', 8898, loop=loop)
+    server = loop.run_until_complete(coro)
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        print('Closing connection')
+    loop.close()

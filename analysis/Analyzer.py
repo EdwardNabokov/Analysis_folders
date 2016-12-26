@@ -1,8 +1,8 @@
-from Folder import Folder
-from Message import Message
-from HandlerMessage import HandlerMessage
-from queue import *
 from queue import Empty
+
+from Message import Message
+from analysis.Folder import Folder
+from analysis.HandlerMessage import HandlerMessage
 
 
 class Analyzer:

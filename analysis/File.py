@@ -1,7 +1,7 @@
-from Block import Block
-from DateTime import DateTime
-import os
 import math
+import os
+from analysis.Block import Block
+from analysis.DateTime import DateTime
 
 
 class File:

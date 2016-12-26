@@ -1,5 +1,5 @@
 from Message import Message
-from Logs import Logs
+from analysis.Logs import Logs
 
 
 class HandlerMessage:

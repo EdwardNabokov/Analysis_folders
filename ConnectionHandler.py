@@ -1,13 +1,15 @@
 import asyncio
 import logging
-import janus
 import threading
+
+import janus
+
 from Connection import Connection
-from Analyzer import Analyzer
-from Message import Message
+from analysis.Analyzer import Analyzer
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('handler')
+
 
 class ConnectionHandler:
     """
@@ -65,7 +67,7 @@ class ConnectionHandler:
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 8898), '/Users/Alexander/untitled/'))
+    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 7865), '/Users/Alexander/untitled/'))
     server = loop.run_until_complete(coro)
     try:
         loop.run_forever()

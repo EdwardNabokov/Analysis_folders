@@ -6,16 +6,17 @@ from Message import Message
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('Connection')
 
+
 class Connection:
     @classmethod
     async def create_connection(cls, loop, addr, client=None):
         """
-        Initialize connection by socket or address
+        Initialize connection by transport or address
         """
         self = Connection()
         self.loop = loop
         self.addr = addr
-        # If direct socket is't given
+        # If direct transport is't given
         if not client:
             self.reader, self.writer = await asyncio.open_connection(self.addr[0], self.addr[1], loop=self.loop)
         # Create connection by address
@@ -24,13 +25,18 @@ class Connection:
         logger.debug("Connection with {}:{} initialized".format(*self.addr))
         return self
 
-    def __create_message(self, message):
+    @staticmethod
+    def __create_message(message):
+        """
+        Code message to binary package
+        :param message: Message object
+        :return: binary data
+        """
         msg_format = "!L{}sL{}sL{}s".format(message.command_size(), message.meta_size(), message.data_size())
         msg = struct.Struct(msg_format)
         msg = msg.pack(message.command_size(), message.command, message.meta_size(),
                        message.meta, message.data_size(), message.data)
         return msg
-
 
     async def receive_message(self):
         """
@@ -39,52 +45,30 @@ class Connection:
         meta
         data
         """
-        m = Message('', '', '')
-        # Receive length of command
-        length = await self.reader.read(4)
-        command_length = struct.unpack('>I', length)[0]
+        message = Message('', '', '')
 
+        message.command = await self._receive_part(4)
+        message.meta = await self._receive_part(4)
+        message.data = await self._receive_part(4)
+
+        return message
+
+    async def _receive_part(self, length):
+        length = await self.reader.read(length)
+        length = struct.unpack('>I', length)[0]
         data = b''
         # Read until all data pi pieces
-        while len(data) != command_length:
-            packet = await self.reader.read(command_length - len(data))
+        while len(data) != length:
+            packet = await self.reader.read(length - len(data))
             if not packet:
                 logger.debug("Receive bad message from {}:{}".format(*self.addr))
                 return None
             data += packet
-        m.command = data
-
-        length = await self.reader.read(4)
-        meta_length = struct.unpack('>I', length)[0]
-        data = b''
-        # Read until all data pi pieces
-        while len(data) != meta_length:
-            packet = await self.reader.read(meta_length - len(data))
-            if not packet:
-                logger.debug("Receive bad message from {}:{}".format(*self.addr))
-                return None
-            data += packet
-        m.meta = data
-
-        length = await self.reader.read(4)
-        data_length = struct.unpack('>I', length)[0]
-        data = b''
-        # Read until all data pi pieces
-        while len(data) != data_length:
-            packet = await self.reader.read(data_length - len(data))
-            if not packet:
-                logger.debug("Receive bad message from {}:{}".format(*self.addr))
-                return None
-            data += packet
-        m.data = data
-
-        logger.debug("Receive message from {}:{}".format(*self.addr))
-        return m
+        return data
 
     async def send_message(self, message):
         """
         Create message from raw data and send to the client
-        message -> (len(data):data)
         """
         data = self.__create_message(message)
         try:

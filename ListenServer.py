@@ -5,6 +5,7 @@ from ConnectionHandler import ConnectionHandler
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('server')
 
+
 class ListenServer:
 
     def __init__(self, loop, path):
@@ -24,7 +25,7 @@ class ListenServer:
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     a = ListenServer(loop, '/Users/Alexander/Google/')
-    coro = asyncio.start_server(a.start, '127.0.0.1', 8898, loop=loop)
+    coro = asyncio.start_server(a.start, '127.0.0.1', 7865, loop=loop)
     server = loop.run_until_complete(coro)
     try:
         loop.run_forever()

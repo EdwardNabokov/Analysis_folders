@@ -1,9 +1,8 @@
-import os
-import sys
 import copy
+import os
 import shutil
-from File import File
-from sys import platform
+
+from analysis.File import File
 
 
 class Folder:

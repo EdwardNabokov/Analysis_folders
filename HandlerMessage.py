@@ -1,6 +1,5 @@
 from Message import Message
 from Logs import Logs
-import os
 
 
 class HandlerMessage:
@@ -29,7 +28,7 @@ class HandlerMessage:
         self.out_queue.put(Message('__CREATE_FILE__', self.message.decode_meta(), ''))
         with open(self.folder_my.get_file(path).full_path, 'rb') as f:
             while True:
-                data = f.read(10240)
+                data = f.read(102400)
                 if data:
                     self.out_queue.put(Message('__APPEND_TO_FILE__', self.message.decode_meta(), data))
                 else:

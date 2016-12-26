@@ -39,27 +39,29 @@ class ConnectionHandler:
 
     async def listenHandler(self):
         """
-		Listen for comming messages and 
+		Listen for comming messages and
 		put them to the queue
 		"""
         logger.debug("Listen handler started")
         while True:
             package = await self.connection.receive_message()
+            print('Receive: ', package)
             self.receive.put(package)
 
     async def sendHandler(self):
         """
-		Take messages from queue and 
+		Take messages from queue and
 		send them
 		"""
         logger.debug("Send handler started")
         while True:
             item = await curio.abide(self.send.get)
             if item:
-                curio.sleep(0.01)
+                print('Send: ', item)
+                await curio.sleep(0.01)
                 await self.connection.send_message(item)
 
 
 if __name__ == '__main__':
     curio.run(
-        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 63048), '/Users/Alexander/untitled/'))
+        ConnectionHandler.runHandler('new_connection', ('127.0.0.1', 50009), '/Users/Alexander/untitled/'))

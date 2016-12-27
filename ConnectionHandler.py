@@ -28,7 +28,7 @@ class ConnectionHandler:
         self.send = janus.Queue(loop=self.loop)
         self.receive = janus.Queue(loop=self.loop)
 
-        # Path to sync folder
+        # Path to button_connection folder
         self.path = path
         # Run analyzer
         analyzer = Analyzer(path, self.receive.sync_q, self.send.sync_q)

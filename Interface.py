@@ -42,12 +42,14 @@ class App(QWidget):
         self.set_folder_options()
         self.set_ip()
         self.set_port()
-        self.set_button_sync()
+        self.set_connection()
+        self.set_listening()
         self.set_logger()
         self.set_layout_main()
 
         self.select_folder.clicked.connect(lambda: self.openFileNamesDialog())
-        self.sync.clicked.connect(lambda: self.checkEveryThing())
+        self.button_connection.clicked.connect(lambda: self.checkEveryThing())
+        #self.button_listening.clicked.connect()
         self.show()
 
     def checkEveryThing(self):
@@ -71,7 +73,6 @@ class App(QWidget):
         except:
             self.output_logger.setText('Smth went wrong')
 
-
     def openFileNamesDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -79,7 +80,14 @@ class App(QWidget):
         if folder:
             self.path.setText(folder)
             self.path_to_folder = folder
-            self.sync.setEnabled(True)
+            self.button_listening.setEnabled(True)
+            self.button_connection.setEnabled(True)
+
+    def set_listening(self):
+        self.button_listening = QPushButton('Listen')
+        self.button_listening.setFont(QFont('Serif', 10))
+        self.button_listening.setFixedSize(100, 30)
+        self.button_listening.setDisabled(True)
 
     def set_layout_main(self):
         self.layout = QFormLayout(self)
@@ -93,7 +101,8 @@ class App(QWidget):
         self.ip_port_grid.addLayout(self.port_name)
         self.my_info = QGroupBox('My information')
         self.horiz = QHBoxLayout()
-        self.horiz.addWidget(self.sync)
+        self.horiz.addWidget(self.button_connection)
+        self.horiz.addWidget(self.button_listening)
         self.horiz.addWidget(self.my_info)
 
         self.layout.addRow(self.folder_grid)
@@ -101,11 +110,11 @@ class App(QWidget):
         self.layout.addRow(self.horiz)
         self.layout.addRow(self.logger_name)
 
-    def set_button_sync(self):
-        self.sync = QPushButton('Sync')
-        self.sync.setFont(QFont('Serif', 10))
-        self.sync.setFixedSize(100, 30)
-        self.sync.setDisabled(True)
+    def set_connection(self):
+        self.button_connection = QPushButton('Connect')
+        self.button_connection.setFont(QFont('Serif', 10))
+        self.button_connection.setFixedSize(100, 30)
+        self.button_connection.setDisabled(True)
 
     def set_ip(self):
         self.ip_address = QLineEdit()
@@ -173,7 +182,7 @@ class App(QWidget):
 
     def set_folder_options(self):
         self.path = QTextBrowser()
-        self.path.setFixedSize(570, 27)
+        self.path.setFixedSize(540, 27)
         self.path.setFont(QFont('Serif', 10))
         self.select_folder = QPushButton('Select Folder')
         self.select_folder.setFont(QFont('Serif', 13))

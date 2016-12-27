@@ -18,7 +18,7 @@ class ConnectionHandler:
     """
     @classmethod
     async def runHandler(cls, loop, addr, path, client=None):
-        logger.debug("Start connection handler")
+        logger.info("Start connection handler")
         self = ConnectionHandler()
         self.loop = loop
         self.addr = addr
@@ -46,7 +46,7 @@ class ConnectionHandler:
         Listen for comming messages and
         put them to the queue
         """
-        logger.debug("Listen handler started")
+        logger.info("Listen handler started")
         while True:
             package = await self.connection.receive_message()
             # print('Receive: ', package)
@@ -57,7 +57,7 @@ class ConnectionHandler:
         Take messages from queue and
         send them
         """
-        logger.debug("Send handler started")
+        logger.info("Send handler started")
         while True:
             item = await self.send.async_q.get()
             if item:
@@ -67,8 +67,7 @@ class ConnectionHandler:
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 7865),
-                                                         '/Users/Alexander/untitled/'))
+    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('172.1.1.121', 59587), '/Users/Alexander/Google/'))
     server = loop.run_until_complete(coro)
     try:
         loop.run_forever()

@@ -22,7 +22,7 @@ class Connection:
         # Create connection by address
         else:
             self.reader, self.writer = client
-        logger.debug("Connection with {}:{} initialized".format(*self.addr))
+        logger.info("Connection with {}:{} initialized".format(*self.addr))
         return self
 
     @staticmethod
@@ -50,18 +50,25 @@ class Connection:
         message.command = await self._receive_part(4)
         message.meta = await self._receive_part(4)
         message.data = await self._receive_part(4)
-
+        logger.info("Receive message {:<20} from {} : {}".format(message.decode_command(), *self.addr))
         return message
 
     async def _receive_part(self, length):
-        length = await self.reader.read(length)
+        data = b''
+        while len(data) != length:
+            packet = await self.reader.read(length - len(data))
+            if not packet:
+                logger.info("Receive bad message from {}:{}".format(*self.addr))
+                return None
+            data += packet
+        length = data
         length = struct.unpack('>I', length)[0]
         data = b''
         # Read until all data pi pieces
         while len(data) != length:
             packet = await self.reader.read(length - len(data))
             if not packet:
-                logger.debug("Receive bad message from {}:{}".format(*self.addr))
+                logger.info("Receive bad message from {}:{}".format(*self.addr))
                 return None
             data += packet
         return data
@@ -78,6 +85,6 @@ class Connection:
             logger.debug("Error while creating message")
             logger.error('Failed : ' + str(e))
             pass
-        logger.debug("Send message to {}:{}".format(*self.addr))
+        logger.info("Send message     {:<20} to {}:{}".format(message.decode_command(), *self.addr))
 
 

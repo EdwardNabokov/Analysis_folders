@@ -9,7 +9,7 @@ logger = logging.getLogger('server')
 class ListenServer:
 
     def __init__(self, loop, path):
-        # logger.debug("Start listening server: {}:{}".format(*self.sock.getsockname()))
+        logger.info("Start listening server")
         self.loop = loop
         self.path = path
 

@@ -1,9 +1,10 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import *
 import asyncio
 import quamash
+import socket
+import logging
 from ListenServer import ListenServer
 from ConnectionHandler import ConnectionHandler
 
@@ -18,19 +19,14 @@ class App(QWidget):
         self.width = 700
         self.height = 500
         self.path_to_folder = ''
-        self.my_ip = '192.168.1.118'
-        self.my_port = '87654'
+        self.my_ip = ''
+        self.my_port = ''
         self.connect_ip = ''
         self.connect_port = ''
         self.green = "QWidget { color:#32CD32;}"
         self.red = "QWidget { color:#FF0000; }"
         self.greenb = "QWidget { background-color:#32CD32;}"
         self.redb = "QWidget { background-color:#FF0000; }"
-
-        a = ListenServer(loop, '/Users/Alexander/Google/')
-        coro = asyncio.start_server(a.start, '0.0.0.0', 8888, loop=loop)
-        asyncio.ensure_future(coro)
-
         self.initUI()
 
     def initUI(self):
@@ -45,29 +41,44 @@ class App(QWidget):
         self.set_connection()
         self.set_listening()
         self.set_logger()
-        self.set_my_info()
+        self.set_my_info(self.my_ip, str(self.my_port))
         self.set_other_info()
         self.set_layout_main()
 
         self.select_folder.clicked.connect(lambda: self.openFileNamesDialog())
-        self.button_connection.clicked.connect(lambda: self.checkEveryThing())
+        self.button_connection.clicked.connect(lambda: self.connectTo())
         self.button_listening.clicked.connect(lambda: self.pushed_listen())
         self.show()
 
     def pushed_listen(self):
         self.select_folder.setDisabled(True)
         self.button_listening.setDisabled(True)
+        self.my_ip = [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+        self.my_port = self.get_open_port()
+        self.my_ip_label.setText(str(self.my_ip))
+        self.my_port_label.setText(str(self.my_port))
+        server = ListenServer(loop, self.path_to_folder)
+        coro = asyncio.start_server(server.start, self.my_ip, self.my_port, loop=loop)
+        asyncio.ensure_future(coro)
 
-    def set_my_info(self):
+    def get_open_port(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(("", 0))
+        s.listen(1)
+        port = s.getsockname()[1]
+        s.close()
+        return port
+
+    def set_my_info(self, my_ip, my_port):
         self.ip_add_horizontal = QHBoxLayout()
-        self.my_ip_label = self.set_label(self.my_ip, 9, True)
-        self.ip_label2 = self.set_label('IP Address', 10, True)
+        self.my_ip_label = self.set_label(my_ip, 9, True)
+        self.ip_label2 = self.set_label('IP Address', 11, True)
         self.ip_add_horizontal.addWidget(self.ip_label2)
         self.ip_add_horizontal.addWidget(self.my_ip_label)
 
         self.port_horizontal = QHBoxLayout()
-        self.port_label = self.set_label('port', 9, True)
-        self.my_port_label = self.set_label(self.my_port, 9, True)
+        self.port_label = self.set_label('port', 11, True)
+        self.my_port_label = self.set_label(str(my_port), 9, True)
         self.port_horizontal.addWidget(self.port_label)
         self.port_horizontal.addWidget(self.my_port_label)
 
@@ -80,26 +91,23 @@ class App(QWidget):
         self.ip_port_connect_vertical.addLayout(self.ip_name)
         self.ip_port_connect_vertical.addLayout(self.port_name)
 
-    def checkEveryThing(self):
-        try:
-            if len(self.connect_ip) == 0:
-                self.ip_address.setStyleSheet(self.redb)
+    def connectTo(self):
+        if len(self.connect_ip) == 0:
+            self.ip_address.setStyleSheet(self.redb)
+        else:
+            self.ip_address.setDisabled(True)
+            if len(self.connect_port) == 0:
+                self.port.setStyleSheet(self.redb)
             else:
-                self.ip_address.setDisabled(True)
-                if len(self.connect_port) == 0:
-                    self.port.setStyleSheet(self.redb)
-                else:
-                    self.port.setDisabled(True)
-                    self.path.setDisabled(True)
-                    self.select_folder.setDisabled(True)
-                    self.output_logger.setText(self.path_to_folder)
-                    self.select_folder.setDisabled(True)
-                    self.button_listening.setDisabled(True)
-                    coro = loop.create_task(
-                        ConnectionHandler.runHandler(loop, (self.connect_ip, self.connect_port), self.path_to_folder))
-                    asyncio.ensure_future(coro)
-        except:
-            self.output_logger.setText('Smth went wrong')
+                self.port.setDisabled(True)
+                self.path.setDisabled(True)
+                self.select_folder.setDisabled(True)
+                self.select_folder.setDisabled(True)
+                self.button_listening.setDisabled(True)
+                self.button_connection.setDisabled(True)
+                coro = loop.create_task(
+                    ConnectionHandler.runHandler(loop, (self.connect_ip, self.connect_port), self.path_to_folder))
+                asyncio.ensure_future(coro)
 
     def openFileNamesDialog(self):
         options = QFileDialog.Options()
@@ -119,7 +127,7 @@ class App(QWidget):
 
     def set_layout_main(self):
         self.layout = QFormLayout(self)
-        self.layout.setSpacing(20)
+        self.layout.setSpacing(5)
         self.folder_layoutV = QVBoxLayout()
         self.folder_layoutH = QHBoxLayout()
         self.ip_port_grid = QVBoxLayout()
@@ -134,7 +142,7 @@ class App(QWidget):
         self.ip_port_grid.addLayout(self.port_name)
 
         self.my_info = QGroupBox('My information')
-        self.my_info.setFixedSize(400, 70)
+        self.my_info.setFixedSize(400, 90)
         self.my_info.setLayout(self.ip_port_listen_vertical)
 
         self.listen_info = QHBoxLayout()
@@ -142,7 +150,7 @@ class App(QWidget):
         self.listen_info.addWidget(self.my_info)
 
         self.another_info = QGroupBox('Client information')
-        self.another_info.setFixedSize(400, 80)
+        self.another_info.setFixedSize(400, 90)
         self.another_info.setLayout(self.ip_port_connect_vertical)
 
         self.connect_info = QHBoxLayout()
@@ -151,6 +159,7 @@ class App(QWidget):
 
         self.listen_part = QGroupBox('Listen')
         self.listen_part.setLayout(self.listen_info)
+
         self.connect_part = QGroupBox('Connect')
         self.connect_part.setLayout(self.connect_info)
         self.listen_connect_partsV = QVBoxLayout()
@@ -175,7 +184,7 @@ class App(QWidget):
         self.ip_address.setPlaceholderText(' enter ip address...')
         self.ip_address.setFont(ip_add_font)
         self.ip_address.setMaxLength(15)
-        self.ip_label = self.set_label('IP Address', 10, True)
+        self.ip_label = self.set_label('IP Address', 11, True)
         self.ip_address.editingFinished.connect(self.textchangedIP)
         self.ip_name = QHBoxLayout()
         self.ip_name.addWidget(self.ip_label)
@@ -215,7 +224,7 @@ class App(QWidget):
         self.port.editingFinished.connect(self.textchangedPORT)
         self.port_label = QLabel()
         self.port_label.setText('port ')
-        port_font = QFont('Serif', 9)
+        port_font = QFont('Serif', 10)
         port_font.setBold(True)
         self.port_label.setFont(port_font)
         self.port_name = QHBoxLayout()
@@ -243,14 +252,29 @@ class App(QWidget):
         self.select_folder.setFont(QFont('Serif', 13))
 
     def set_logger(self):
-        self.output_logger = QTextBrowser()
         self.output_logger_name = QLabel('Logger output')
         self.output_logger_name.setFont(QFont('Serif', 10))
 
+        logTextBox = QPlainTextEditLogger(self)
+        logTextBox.setFormatter(logging.Formatter("%(asctime)s\t%(message)s", "%H:%M:%S"))
+        logging.getLogger().addHandler(logTextBox)
+        logging.getLogger().setLevel(logging.INFO)
+
         self.logger_name = QVBoxLayout()
         self.logger_name.addWidget(self.output_logger_name)
-        self.logger_name.addWidget(self.output_logger)
+        self.logger_name.addWidget(logTextBox.widget)
         self.logger_name.setSpacing(5)
+
+
+class QPlainTextEditLogger(logging.Handler):
+    def __init__(self, parent):
+        super().__init__()
+        self.widget = QPlainTextEdit(parent)
+        self.widget.setReadOnly(True)
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.widget.appendPlainText(msg)
 
 
 if __name__ == '__main__':

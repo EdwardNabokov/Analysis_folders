@@ -49,7 +49,7 @@ class ConnectionHandler:
         logger.debug("Listen handler started")
         while True:
             package = await self.connection.receive_message()
-            print('Receive: ', package)
+            # print('Receive: ', package)
             await self.receive.async_q.put(package)
 
     async def sendHandler(self):
@@ -61,13 +61,14 @@ class ConnectionHandler:
         while True:
             item = await self.send.async_q.get()
             if item:
-                print('Send: ', item)
+                # print('Send: ', item)
                 await self.connection.send_message(item)
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 7865), '/Users/Alexander/untitled/'))
+    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('192.168.131.213', 7865),
+                                                         'C:\\Users\\Edward\\Desktop\\www\\'))
     server = loop.run_until_complete(coro)
     try:
         loop.run_forever()

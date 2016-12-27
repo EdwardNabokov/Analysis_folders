@@ -10,7 +10,7 @@ class Logs:
 
         different_folders = set_other_folders - set_my_folders
 
-        print('Different_folders: ', different_folders)
+        # print('Different_folders: ', different_folders)
         return list(different_folders)
 
     def cmp_files(self):
@@ -19,5 +19,5 @@ class Logs:
 
         different_files = set_other_files - set_my_files
 
-        print('Different_files: ', different_files)
+        # print('Different_files: ', different_files)
         return list(different_files)

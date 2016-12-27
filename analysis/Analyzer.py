@@ -1,7 +1,6 @@
 from queue import Empty
 import watchdog
 import time
-import schedule
 from watchdog.observers import Observer
 from analysis.HandleChanges import MyHandler
 

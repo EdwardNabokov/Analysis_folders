@@ -10,10 +10,13 @@ class HandlerMessage:
         self.out_queue = out_queue
         self.message_response = {
             '__GET_LOG__': self.get_log,
-            '__GET_FILE__': self.get_file,
             '__SEND_LOG__': self.send_log,
+            '__GET_FILE__': self.get_file,
+            '__CREATE_FOLDER__': self.create_folder,
+            '__REMOVE_FOLDER__': self.remove_folder,
             '__CREATE_FILE__': self.create_file,
             '__APPEND_TO_FILE__': self.append_to_file,
+            '__REMOVE_FILE__': self.remove_file,
         }
 
     def run(self):
@@ -46,5 +49,14 @@ class HandlerMessage:
     def create_file(self):
         self.folder_my.create_file(self.message.decode_meta(), '')
 
+    def remove_file(self):
+        self.folder_my.remove_file(self.message.decode_meta())
+
     def append_to_file(self):
         self.folder_my.append_to_file(self.message.decode_meta(), self.message.data)
+
+    def create_folder(self):
+        self.folder_my.create_folder(self.message.decode_meta())
+
+    def remove_folder(self):
+        self.folder_my.remove_folder(self.message.decode_meta())

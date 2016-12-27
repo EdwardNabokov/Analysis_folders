@@ -16,10 +16,10 @@ class App(QWidget):
         self.left = 300
         self.top = 200
         self.width = 700
-        self.height = 400
+        self.height = 500
         self.path_to_folder = ''
-        self.my_ip = ''
-        self.my_port = ''
+        self.my_ip = '192.168.1.118'
+        self.my_port = '87654'
         self.connect_ip = ''
         self.connect_port = ''
         self.green = "QWidget { color:#32CD32;}"
@@ -45,12 +45,40 @@ class App(QWidget):
         self.set_connection()
         self.set_listening()
         self.set_logger()
+        self.set_my_info()
+        self.set_other_info()
         self.set_layout_main()
 
         self.select_folder.clicked.connect(lambda: self.openFileNamesDialog())
         self.button_connection.clicked.connect(lambda: self.checkEveryThing())
-        #self.button_listening.clicked.connect()
+        self.button_listening.clicked.connect(lambda: self.pushed_listen())
         self.show()
+
+    def pushed_listen(self):
+        self.select_folder.setDisabled(True)
+        self.button_listening.setDisabled(True)
+
+    def set_my_info(self):
+        self.ip_add_horizontal = QHBoxLayout()
+        self.my_ip_label = self.set_label(self.my_ip, 9, True)
+        self.ip_label2 = self.set_label('IP Address', 10, True)
+        self.ip_add_horizontal.addWidget(self.ip_label2)
+        self.ip_add_horizontal.addWidget(self.my_ip_label)
+
+        self.port_horizontal = QHBoxLayout()
+        self.port_label = self.set_label('port', 9, True)
+        self.my_port_label = self.set_label(self.my_port, 9, True)
+        self.port_horizontal.addWidget(self.port_label)
+        self.port_horizontal.addWidget(self.my_port_label)
+
+        self.ip_port_listen_vertical = QVBoxLayout()
+        self.ip_port_listen_vertical.addLayout(self.ip_add_horizontal)
+        self.ip_port_listen_vertical.addLayout(self.port_horizontal)
+
+    def set_other_info(self):
+        self.ip_port_connect_vertical = QVBoxLayout()
+        self.ip_port_connect_vertical.addLayout(self.ip_name)
+        self.ip_port_connect_vertical.addLayout(self.port_name)
 
     def checkEveryThing(self):
         try:
@@ -58,18 +86,18 @@ class App(QWidget):
                 self.ip_address.setStyleSheet(self.redb)
             else:
                 self.ip_address.setDisabled(True)
-
-            if len(self.connect_port) == 0:
-                self.port.setStyleSheet(self.redb)
-            else:
-                self.port.setDisabled(True)
-                self.path.setDisabled(True)
-                self.select_folder.setDisabled(True)
-                self.output_logger.setText(self.path_to_folder)
-
-                coro = loop.create_task(
-                    ConnectionHandler.runHandler(loop, (self.connect_ip, self.connect_port), self.path_to_folder))
-                asyncio.ensure_future(coro)
+                if len(self.connect_port) == 0:
+                    self.port.setStyleSheet(self.redb)
+                else:
+                    self.port.setDisabled(True)
+                    self.path.setDisabled(True)
+                    self.select_folder.setDisabled(True)
+                    self.output_logger.setText(self.path_to_folder)
+                    self.select_folder.setDisabled(True)
+                    self.button_listening.setDisabled(True)
+                    coro = loop.create_task(
+                        ConnectionHandler.runHandler(loop, (self.connect_ip, self.connect_port), self.path_to_folder))
+                    asyncio.ensure_future(coro)
         except:
             self.output_logger.setText('Smth went wrong')
 
@@ -91,23 +119,46 @@ class App(QWidget):
 
     def set_layout_main(self):
         self.layout = QFormLayout(self)
-        self.layout.setSpacing(40)
-        self.folder_grid = QHBoxLayout()
-        self.ip_port_grid = QHBoxLayout()
+        self.layout.setSpacing(20)
+        self.folder_layoutV = QVBoxLayout()
+        self.folder_layoutH = QHBoxLayout()
+        self.ip_port_grid = QVBoxLayout()
 
-        self.folder_grid.addWidget(self.path)
-        self.folder_grid.addWidget(self.select_folder)
+        self.folder_layoutH.addWidget(self.path)
+        self.folder_layoutH.addWidget(self.select_folder)
+        self.folder_layoutV.addWidget(self.folder_to_sync)
+        self.folder_layoutV.addLayout(self.folder_layoutH)
+        self.folder_layoutV.setSpacing(5)
+
         self.ip_port_grid.addLayout(self.ip_name)
         self.ip_port_grid.addLayout(self.port_name)
-        self.my_info = QGroupBox('My information')
-        self.horiz = QHBoxLayout()
-        self.horiz.addWidget(self.button_connection)
-        self.horiz.addWidget(self.button_listening)
-        self.horiz.addWidget(self.my_info)
 
-        self.layout.addRow(self.folder_grid)
-        self.layout.addRow(self.ip_port_grid)
-        self.layout.addRow(self.horiz)
+        self.my_info = QGroupBox('My information')
+        self.my_info.setFixedSize(400, 70)
+        self.my_info.setLayout(self.ip_port_listen_vertical)
+
+        self.listen_info = QHBoxLayout()
+        self.listen_info.addWidget(self.button_listening)
+        self.listen_info.addWidget(self.my_info)
+
+        self.another_info = QGroupBox('Client information')
+        self.another_info.setFixedSize(400, 80)
+        self.another_info.setLayout(self.ip_port_connect_vertical)
+
+        self.connect_info = QHBoxLayout()
+        self.connect_info.addWidget(self.button_connection)
+        self.connect_info.addWidget(self.another_info)
+
+        self.listen_part = QGroupBox('Listen')
+        self.listen_part.setLayout(self.listen_info)
+        self.connect_part = QGroupBox('Connect')
+        self.connect_part.setLayout(self.connect_info)
+        self.listen_connect_partsV = QVBoxLayout()
+        self.listen_connect_partsV.addWidget(self.listen_part)
+        self.listen_connect_partsV.addWidget(self.connect_part)
+
+        self.layout.addRow(self.folder_layoutV)
+        self.layout.addRow(self.listen_connect_partsV)
         self.layout.addRow(self.logger_name)
 
     def set_connection(self):
@@ -119,21 +170,25 @@ class App(QWidget):
     def set_ip(self):
         self.ip_address = QLineEdit()
         self.ip_address.setFixedSize(300, 25)
-        ip_add_font = QFont('Serif', 10)
+        ip_add_font = QFont('Serif', 9)
         ip_add_font.setFamily('Times New Roman')
         self.ip_address.setPlaceholderText(' enter ip address...')
         self.ip_address.setFont(ip_add_font)
         self.ip_address.setMaxLength(15)
-        self.ip_label = QLabel()
-        self.ip_label.setText('IP-Address')
-        ip_font = QFont('Serif', 11)
-        ip_font.setBold(True)
-        self.ip_label.setFont(ip_font)
+        self.ip_label = self.set_label('IP Address', 10, True)
         self.ip_address.editingFinished.connect(self.textchangedIP)
-        self.ip_name = QVBoxLayout()
+        self.ip_name = QHBoxLayout()
         self.ip_name.addWidget(self.ip_label)
         self.ip_name.addWidget(self.ip_address)
         self.ip_name.setSpacing(5)
+
+    def set_label(self, text, how_big, bold):
+        ip_l = QLabel()
+        ip_l.setText(text)
+        ip_font = QFont('Serif', how_big)
+        ip_font.setBold(bold)
+        ip_l.setFont(ip_font)
+        return ip_l
 
     def textchangedIP(self):
         try:
@@ -154,17 +209,16 @@ class App(QWidget):
         self.port.setFixedSize(300, 25)
         port_add_font = QFont('Serif', 10)
         port_add_font.setFamily('Times New Roman')
-        self.port.setObjectName("port")
         self.port.setPlaceholderText(' enter port...')
         self.port.setFont(QFont(port_add_font))
         self.port.setMaxLength(5)
         self.port.editingFinished.connect(self.textchangedPORT)
         self.port_label = QLabel()
-        self.port_label.setText('Port ')
-        port_font = QFont('Serif', 11)
+        self.port_label.setText('port ')
+        port_font = QFont('Serif', 9)
         port_font.setBold(True)
         self.port_label.setFont(port_font)
-        self.port_name = QVBoxLayout()
+        self.port_name = QHBoxLayout()
         self.port_name.addWidget(self.port_label)
         self.port_name.addWidget(self.port)
         self.port_name.setSpacing(5)
@@ -181,6 +235,7 @@ class App(QWidget):
             self.port.setStyleSheet(self.red)
 
     def set_folder_options(self):
+        self.folder_to_sync = QLabel('Select folder to sync: ')
         self.path = QTextBrowser()
         self.path.setFixedSize(540, 27)
         self.path.setFont(QFont('Serif', 10))
@@ -196,6 +251,7 @@ class App(QWidget):
         self.logger_name.addWidget(self.output_logger_name)
         self.logger_name.addWidget(self.output_logger)
         self.logger_name.setSpacing(5)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

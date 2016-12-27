@@ -67,8 +67,8 @@ class ConnectionHandler:
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('192.168.131.213', 7865),
-                                                         'C:\\Users\\Edward\\Desktop\\www\\'))
+    coro = loop.create_task(ConnectionHandler.runHandler(loop, ('127.0.0.1', 7865),
+                                                         '/Users/Alexander/untitled/'))
     server = loop.run_until_complete(coro)
     try:
         loop.run_forever()

@@ -2,6 +2,10 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+import asyncio
+import quamash
+from ListenServer import ListenServer
+from ConnectionHandler import ConnectionHandler
 
 
 
@@ -13,16 +17,21 @@ class App(QWidget):
         self.top = 200
         self.width = 700
         self.height = 400
-        self.initUI()
         self.path_to_folder = ''
         self.my_ip = ''
         self.my_port = ''
-        self.another_comp_IP_address = ''
-        self.another_comp_port = ''
+        self.connect_ip = ''
+        self.connect_port = ''
         self.green = "QWidget { color:#32CD32;}"
         self.red = "QWidget { color:#FF0000; }"
         self.greenb = "QWidget { background-color:#32CD32;}"
         self.redb = "QWidget { background-color:#FF0000; }"
+
+        a = ListenServer(loop, '/Users/Alexander/Google/')
+        coro = asyncio.start_server(a.start, '0.0.0.0', 8888, loop=loop)
+        asyncio.ensure_future(coro)
+
+        self.initUI()
 
     def initUI(self):
         self.move(self.left, self.top)
@@ -43,25 +52,25 @@ class App(QWidget):
 
     def checkEveryThing(self):
         try:
-            if len(self.another_comp_IP_address) == 0:
+            if len(self.connect_ip) == 0:
                 self.ip_address.setStyleSheet(self.redb)
             else:
                 self.ip_address.setDisabled(True)
 
-            if len(self.another_comp_port) == 0:
+            if len(self.connect_port) == 0:
                 self.port.setStyleSheet(self.redb)
             else:
                 self.port.setDisabled(True)
                 self.path.setDisabled(True)
                 self.select_folder.setDisabled(True)
                 self.output_logger.setText(self.path_to_folder)
-                # self.start_()
+
+                coro = loop.create_task(
+                    ConnectionHandler.runHandler(loop, (self.connect_ip, self.connect_port), self.path_to_folder))
+                asyncio.ensure_future(coro)
         except:
             self.output_logger.setText('Smth went wrong')
 
-    # def start_(self):
-    #     start_listening()
-    #     start_connection(self.another_comp_IP_address, self.another_comp_port, self.path_to_folder)
 
     def openFileNamesDialog(self):
         options = QFileDialog.Options()
@@ -71,41 +80,6 @@ class App(QWidget):
             self.path.setText(folder)
             self.path_to_folder = folder
             self.sync.setEnabled(True)
-
-    def progressbar(self):
-
-        self.pbar = QProgressBar(self)
-        self.pbar.setGeometry(30, 40, 200, 25)
-
-        self.btn = QPushButton('Start', self)
-        self.btn.move(40, 80)
-        self.btn.clicked.connect(self.doAction)
-
-        self.timer = QBasicTimer()
-        self.step = 0
-
-        self.setGeometry(300, 300, 280, 170)
-        self.setWindowTitle('QProgressBar')
-        self.show()
-
-    def timerEvent(self, e):
-
-        if self.step >= 100:
-            self.timer.stop()
-            self.btn.setText('Finished')
-            return
-
-        self.step = self.step + 1
-        self.pbar.setValue(self.step)
-
-    def doAction(self):
-
-        if self.timer.isActive():
-            self.timer.stop()
-            self.btn.setText('Start')
-        else:
-            self.timer.start(100, self)
-            self.btn.setText('Stop')
 
     def set_layout_main(self):
         self.layout = QFormLayout(self)
@@ -121,7 +95,6 @@ class App(QWidget):
         self.horiz = QHBoxLayout()
         self.horiz.addWidget(self.sync)
         self.horiz.addWidget(self.my_info)
-
 
         self.layout.addRow(self.folder_grid)
         self.layout.addRow(self.ip_port_grid)
@@ -159,7 +132,7 @@ class App(QWidget):
             valid = [int(b) for b in host_bytes]
             valid = [b for b in valid if b >= 0 and b <= 255]
             if len(host_bytes) == 4 and len(valid) == 4:
-                self.another_comp_IP_address = self.ip_address.text()
+                self.connect_ip = self.ip_address.text()
                 self.ip_address.setStyleSheet(self.green)
             else:
 
@@ -191,7 +164,7 @@ class App(QWidget):
         try:
             valid = [int(char) for char in self.port.text()]
             if len(valid) <= 5:
-                self.another_comp_port = self.port.text()
+                self.connect_port = self.port.text()
                 self.port.setStyleSheet(self.green)
             else:
                 self.port.setStyleSheet(self.red)
@@ -216,7 +189,9 @@ class App(QWidget):
         self.logger_name.setSpacing(5)
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
-    ex = App()
-    app.exec_()
+    loop = quamash.QEventLoop(app)
+    asyncio.set_event_loop(loop)
+    with loop:
+        ex = App()
+        app.exec_()

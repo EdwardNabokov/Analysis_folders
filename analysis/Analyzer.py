@@ -1,5 +1,5 @@
 from queue import Empty
-import watchdog
+import schedule
 import time
 from watchdog.observers import Observer
 from analysis.HandleChanges import MyHandler
@@ -18,7 +18,7 @@ class Analyzer:
         self.my_log = {}
         self.another_log_copy = {}
 
-        # schedule.every(10).seconds.do(self.test)
+        schedule.every(30).seconds.do(self.test)
 
     def run(self):
         self.folder = Folder(self.path_to_folder)
@@ -28,15 +28,14 @@ class Analyzer:
         observer.start()
         self.out_queue.put(Message('__GET_LOG__', '', ''))
         while True:
-            # schedule.run_pending()
             if not self.in_queue.empty():
                 item = self.in_queue.get()
                 HandlerMessage(item, self.folder, self.out_queue).run()
             else:
-                time.sleep(1)
+                schedule.run_pending()
 
-    # def test(self):
-    #     self.folder.analyze()
-    #     self.folder.create_log()
-    #     self.out_queue.put(Message('__GET_LOG__', '', ''))
+    def test(self):
+        self.folder.analyze()
+        self.folder.create_log()
+        self.out_queue.put(Message('__GET_LOG__', '', ''))
 

@@ -15,13 +15,14 @@ class Folder:
         """
         self.base_path = path
         self.log_new = {}
-        self.log_old = {}
         self.folders = []
         self.files = []
         self.analyze()
         self.create_log()
 
     def analyze(self):
+        self.folders = []
+        self. files = []
         for root, directories, ifiles in os.walk(self.base_path):
             for dir in directories:
                 self.folders.append(tuple(os.path.join(root[len(self.base_path):], dir).split(os.sep)))
@@ -31,7 +32,6 @@ class Folder:
                self.files.append(File(tuple(os.path.join(root[len(self.base_path):], file).split(os.sep)), self.base_path))
 
     def create_log(self):
-        self.log_old = copy.deepcopy(self.log_new)
         self.log_new['folders'] = copy.deepcopy(self.folders)
         self.log_new['files'] = copy.deepcopy(self.files)
 
@@ -80,7 +80,9 @@ class Folder:
         try:
             with open(os.path.join(self.base_path, *rel_file_path), 'wb+') as f:
                 f.write(file)
-            self.files.append(File(rel_file_path, self.base_path))
+
+            if rel_file_path not in [x.get_rel_path() for x in self.files]:
+                self.files.append(File(rel_file_path, self.base_path))
             if not os.path.exists(self.base_path + os.path.join(*rel_file_path)):
                 print('Error while creating file')
         except:

@@ -43,12 +43,21 @@ class HandlerMessage:
             pass
 
     def send_log(self):
-        different_folders = Logs(self.folder_my.get_log_file(), self.message.decode_meta()).cmp_folders()
-        different_files = Logs(self.folder_my.get_log_file(), self.message.decode_meta()).cmp_files()
+        compare = Logs(self.folder_my.get_log_file(), self.message.decode_meta())
+        different_folders = compare.cmp_folders()
+        different_files = compare.cmp_files()
+        equal_files = compare.equal_files()
+
         for i in different_folders:
             self.folder_my.create_folder(i)
         for i in different_files:
             self.out_queue.put(Message('__GET_FILE__', i, ''))
+        for i in equal_files:
+            if i[1]:
+                print('*' * 30)
+                print('old file', i)
+                print('*' * 30)
+                self.out_queue.put(Message('__GET_FILE__', i[0], ''))
 
     def create_file(self):
         self.folder_my.create_file(self.message.decode_meta(), '')

@@ -30,13 +30,16 @@ class HandlerMessage:
     def get_file(self):
         path = self.message.decode_meta()
         self.out_queue.put(Message('__CREATE_FILE__', self.message.decode_meta(), ''))
-        with open(self.folder_my.get_file(path).full_path, 'rb') as f:
-            while True:
-                data = f.read(102400)
-                if data:
-                    self.out_queue.put(Message('__APPEND_TO_FILE__', self.message.decode_meta(), data))
-                else:
-                    break
+        try:
+            with open(self.folder_my.get_file(path).full_path, 'rb') as f:
+                while True:
+                    data = f.read(102400)
+                    if data:
+                        self.out_queue.put(Message('__APPEND_TO_FILE__', self.message.decode_meta(), data))
+                    else:
+                        break
+        except:
+            pass
 
     def send_log(self):
         different_folders = Logs(self.folder_my.get_log_file(), self.message.decode_meta()).cmp_folders()

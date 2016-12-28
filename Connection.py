@@ -85,6 +85,6 @@ class Connection:
             logger.debug("Error while creating message")
             logger.error('Failed : ' + str(e))
             pass
-        logger.info("Send message     {:<20} to {}:{}".format(message.decode_command(), *self.addr))
+        logger.info("Send message     {:<20}   {} to {}:{}".format(message.decode_command(), message.decode_meta(), *self.addr))
 
 

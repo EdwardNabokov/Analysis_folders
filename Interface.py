@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import asyncio
@@ -115,7 +116,7 @@ class App(QWidget):
         folder = str(QFileDialog.getExistingDirectory(self, "Select Directory", options=options))
         if folder:
             self.path.setText(folder)
-            self.path_to_folder = folder
+            self.path_to_folder = folder + os.sep
             self.button_listening.setEnabled(True)
             self.button_connection.setEnabled(True)
 

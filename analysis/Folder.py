@@ -52,16 +52,15 @@ class Folder:
         create folder in the current path to folder
         :param path_to_folder: it's path to the current folder
         """
-        try:
-            a = []
-            for folder in path_to_folder:
-                a.append(folder)
-                if tuple(a) not in self.folders:
-                    print(self.base_path + os.path.join(*a))
+        a = []
+        for folder in path_to_folder:
+            a.append(folder)
+            if tuple(a) not in self.folders:
+                try:
                     os.makedirs(self.base_path + os.path.join(*a))
-                    self.folders.append(a)
-        except:
-            pass
+                except:
+                    pass
+                self.folders.append(a)
 
     def remove_folder(self, path_to_folder):
         self.folders = [x for x in self.folders if os.path.join(*path_to_folder) not in os.path.join(*x)]
@@ -76,7 +75,7 @@ class Folder:
         :param file_object: certain file that we have to create
         :param file: file (in bytes)
         """
-        if len(rel_file_path) > 1:
+        if len(rel_file_path) > 2:
             self.create_folder(rel_file_path[:-1])
         try:
             with open(os.path.join(self.base_path, *rel_file_path), 'wb+') as f:
@@ -88,15 +87,22 @@ class Folder:
             pass
 
     def remove_file(self, path_to_file):
-        try:
             for i, x in enumerate(self.files):
                 if x.get_rel_path() == path_to_file:
-                    del self.files[i]
-                    break
-            os.remove(os.path.join(self.base_path, *path_to_file))
-        except:
-            pass
+                    try:
+                        del self.files[i]
+                    except:
+                        break
+            try:
+                os.remove(os.path.join(self.base_path, *path_to_file))
+            except:
+                pass
 
     def append_to_file(self, path, data):
-        with open(os.path.join(self.base_path, *path), 'ab') as f:
-            f.write(data)
+        try:
+            with open(os.path.join(self.base_path, *path), 'ab') as f:
+                f.write(data)
+        except:
+            self.create_file(path)
+            with open(os.path.join(self.base_path, *path), 'ab') as f:
+                f.write(data)

@@ -106,3 +106,9 @@ class Folder:
             self.create_file(path)
             with open(os.path.join(self.base_path, *path), 'ab') as f:
                 f.write(data)
+
+    def rename(self, path_from, path_to):
+        try:
+            shutil.move(os.path.join(self.base_path, *path_from), os.path.join(self.base_path, *path_to))
+        except:
+            pass

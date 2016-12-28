@@ -13,19 +13,15 @@ class MyHandler(FileSystemEventHandler):
         self.out_queue = out_queue
         self.in_queue = in_queue
 
-    def process(self, event):
-        print(event.src_path, event.event_type)
+    def on_moved(self, event):
+        path_from = tuple(event.src_path[len(self.folder.base_path):].split(os.path.sep))
+        path_to = tuple(event.dest_path[len(self.folder.base_path):].split(os.path.sep))
+        self.out_queue.put(Message('__MOVE__', (path_from, path_to), b''))
 
     def on_modified(self, event):
-        self.process(event)
-        # path = tuple(event.src_path[len(self.folder.base_path):].split(os.path.sep))
-        # if '.' in path[-1]:
-        #     self.folder.files.append(File(path, self.folder.base_path))
-        #     self.out_queue.put(Message('__REMOVE_FILE__', path, b''))
-        #     self.in_queue.put(Message('__`GET_FILE__', path, b''))
+        pass
 
     def on_created(self, event):
-        self.process(event)
         path = tuple(event.src_path[len(self.folder.base_path):].split(os.path.sep))
         if '.' in path[-1]:
             try:
@@ -38,7 +34,6 @@ class MyHandler(FileSystemEventHandler):
             self.out_queue.put(Message('__CREATE_FOLDER__', path, b''))
 
     def on_deleted(self, event):
-        self.process(event)
         path = tuple(event.src_path[len(self.folder.base_path):].split(os.path.sep))
         if '.' in path[-1]:
             self.folder.remove_file(path)

@@ -3,7 +3,6 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import asyncio
-import quamash
 import socket
 import logging
 from ListenServer import ListenServer
@@ -278,10 +277,14 @@ class QPlainTextEditLogger(logging.Handler):
         self.widget.appendPlainText(msg)
 
 
+async def process_events(qapp):
+    while True:
+        await asyncio.sleep(0.01)
+        qapp.processEvents()
+
+
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    loop = quamash.QEventLoop(app)
-    asyncio.set_event_loop(loop)
-    with loop:
-        ex = App()
-        app.exec_()
+    qapp = QApplication(sys.argv)
+    loop = asyncio.get_event_loop()
+    ex = App()
+    loop.run_until_complete(process_events(qapp))

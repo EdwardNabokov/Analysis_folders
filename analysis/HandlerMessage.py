@@ -17,6 +17,7 @@ class HandlerMessage:
             '__CREATE_FILE__': self.create_file,
             '__APPEND_TO_FILE__': self.append_to_file,
             '__REMOVE_FILE__': self.remove_file,
+            '__MOVE__': self.rename,
         }
 
     def run(self):
@@ -63,3 +64,7 @@ class HandlerMessage:
 
     def remove_folder(self):
         self.folder_my.remove_folder(self.message.decode_meta())
+
+    def rename(self):
+        path_form, path_to = self.message.decode_meta()
+        self.folder_my.rename(path_form, path_to)

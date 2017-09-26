@@ -3,12 +3,7 @@ from datetime import datetime
 import ntplib
 import os
 
-#
-# c = ntplib.NTPClient()
-# response = c.request('europe.pool.ntp.org', version=3)
-# current_time = datetime.strptime(datetime.fromtimestamp(response.tx_time).
-#                                  strftime('%a %b %d %H:%M:%S %Y'), "%a %b %d %H:%M:%S %Y")
-
+# TODO : implement controlinand conne
 
 class DateTime:
 
@@ -19,7 +14,3 @@ class DateTime:
 
     def get_time_modification(self):
         return self.time_modification
-
-
-
-

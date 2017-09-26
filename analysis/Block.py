@@ -1,3 +1,4 @@
+# import basic libraries
 import hashlib
 import asyncio
 import time
@@ -5,8 +6,26 @@ import zlib
 
 
 class Block:
-
     def __init__(self, position, block):
+        """
+        Base constructor for block in a file.
+
+        Parameters
+        ----------
+        position : int
+            It is a position in a file of certain block.
+
+        block : bytes
+            It is a content of the block.
+
+        Variables
+        ---------
+        simple_checksum : hash
+            It is an simple checksum that is used in rsync.
+            There is also hard checksum.
+
+        """
+
         self.position = position
         self.block = block
         self.simple_checksum = self.get_simple_checksum()
@@ -14,36 +33,24 @@ class Block:
     def get_position(self):
         return self.position
 
-    # @staticmethod
-    # def __weak_check_sum(data):
-    #     """
-    #     Generates a weak checksum from an iterable set of bytes.
-    #     """
-    #     a = b = 0
-    #     for i in range(len(data)):
-    #         a += data[i]
-    #         b += (len(data) - i + 1) * data[i]
-    #     a %= 2 ** 16
-    #     b %= 2 ** 16
-    #     return (b << 16) + a
+    # TODO : implement weak checksum
+    def __weak_check_sum(data):
+        pass
 
     def get_simple_checksum(self):
-        # hash_w = self.weak_check_sum(bytes(self.block))
-        hash_w = zlib.adler32(self.block)
-        return hash_w
+        # compute and return simple checksum for block
+        return zlib.adler32(self.block)
 
     def get_hard_checksum(self):
-        hash_s = hashlib.md5(self.block).hexdigest()
-        return hash_s
+        # compute and return hard checksum for block
+        return hashlib.md5(self.block).hexdigest()
 
     def get_block(self):
+        # return block's content
         return self.block
 
     def __eq__(self, other_check_sum):
-        # print('comparing')
         return self.simple_checksum == other_check_sum
 
     def __str__(self):
         return str(self.block)
-
-

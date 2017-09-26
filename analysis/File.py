@@ -1,18 +1,31 @@
+# import basic libraries
 import math
 import os
+
+# import custom modules
 from analysis.Block import Block
 from analysis.DateTime import DateTime
 
 
 class File:
-
     def __init__(self, rel_path, file_base, block_size=1024):
         """
-        initialize essential parameters
-        :param rel_path: tuple ( folder[,folder], file_name )
-        :param file_path: it's path from its root (Example: C://Downloads//test)
-        :param block_size: 1024 by default
+        Base constructor for File object.
+
+        Parameters
+        ----------
+        rel_path : tuple( folder[,folder], file_name )
+            It keeps relative path from give path to folder, that is being
+            analyzing and its child (e.g folders, files).
+
+        file_path : path
+            It's path from its root (e.g C://Downloads/test).
+
+        block_size : int (default 1024)
+            Size of the block.
+
         """
+
         self.block_size = block_size
         self.file_base = file_base
         self.rel_path = rel_path
@@ -23,69 +36,50 @@ class File:
         self.time_of_modification = DateTime(self.full_path).get_time_modification()
         self.list_blocks_checksums = [value.simple_checksum for i, value in enumerate(self._iterator_block_list())]
 
+
+    # TODO : implement comparison two files splitting them on blocks.
     def __eq__(self, other):
         if len(self.list_blocks_checksums) < len(other.list_blocks_checksums):
             for i, checksum in enumerate(self.list_blocks_checksums):
                 if self._iterator_block_list() == other.list_blocks_checksums[i]:
-                    # print('qwe equal')
                     pass
-                    #print('Block with position {} are different'.format(i))
         else:
             for i, checksum in enumerate(other.list_blocks_checksums):
                 if checksum != self.list_blocks_checksums[i]:
                     pass
-                    #print('Block with position {} are different'.format(i))
 
     def get_file_name(self):
         return self.file_name
 
     def get_rel_path(self):
-        curr_path = self.rel_path
-        return curr_path
-
-    def get_list_checksums(self):
-        pass
+        return self.rel_path
 
     def get_block_size(self):
+        """Return default size of block."""
         return self.block_size
 
     def get_size_of_file(self):
+        """Return size of the file."""
         return self.size_of_file
 
     def get_time_modification(self):
-        """
-        Get date of last modification
-        :return: time of last modification
-        """
+        """Return last time of file's modification."""
         return self.time_of_modification
 
     def get_amount_of_blocks(self):
+        """Return amount of blocks in file."""
         return self.amount_of_blocks
 
     def get_sums_each_block(self):
+        """Split file on blocks, compute their checksums and add them to list."""
         list_check = []
         block = self._iterator_block_list()
         for x in range(math.ceil(self.amount_of_blocks)):
             list_check.append(next(block).simple_checksum)
         return list_check
 
-    # def get_unmatched_blocks(self, list_check_sums):
-    #     """
-    #     Find unmatched blocks
-    #     :param list_check_sums: list of check sums from another computer (list(int))
-    #     :return: list of unmatched blocks (Block)
-    #     """
-    #     list_unmatched = []
-    #     for i, iter_ch_sum in enumerate(self._iterator_block_list()):
-    #         if iter_ch_sum != list_check_sums[i]:
-    #             list_unmatched.append(iter_ch_sum)
-    #     return list_unmatched
-
     def _iterator_block_list(self):
-        """
-        iterate blocks in file
-        :return: block
-        """
+        """Iterate through each block in file."""
         i = 0
         with open(self.full_path, 'rb') as file:
             block = Block(i, file.read(self.block_size))
@@ -95,6 +89,7 @@ class File:
                 block = Block(i, file.read(self.block_size))
 
     def get_file(self):
+        """Generator for each new file."""
         with open(self.full_path, 'rb') as opened:
             for line in opened:
                 yield line
